@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>InfoPet · Maquetas</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,Inter,sans-serif;background:#0C1210;color:#f5f5f5;min-height:100vh;padding:40px 20px}
+  .container{max-width:900px;margin:0 auto}
+  h1{font-size:32px;font-weight:600;margin-bottom:8px;background:linear-gradient(135deg,#2D6A4F,#5AC8FA);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  p{color:#9aa;margin-bottom:32px;font-size:14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+  a{display:block;padding:18px 20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;color:#f5f5f5;text-decoration:none;transition:all .2s;backdrop-filter:blur(10px)}
+  a:hover{background:rgba(45,106,79,0.15);border-color:#2D6A4F;transform:translateY(-2px)}
+  .name{font-weight:500;font-size:15px;margin-bottom:4px}
+  .date{font-size:12px;color:#6c7}
+  footer{margin-top:40px;text-align:center;color:#566;font-size:12px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🐾 InfoPet · Maquetas</h1>
+  <p>Galería de maquetas HTML de Smart Connection — InfoPet Reñaca</p>
+  <div class="grid" id="grid"></div>
+  <footer>Powered by GitHub Pages · SmartConnection-CodeHub/infopet-maquetas</footer>
+</div>
+<script>
+const files = [  "2026-03-23-infopet-contraste-fix.html",  "2026-03-24-infopet-contraste-fix-v2.html",  "2026-04-02-recepcion-automatica.html",  "2026-04-07-display-logic.html",  "2026-04-07-facturas-ocr-mobile.html",  "2026-04-07-infopet-renaca-desktop.html",  "2026-04-07-infopet-renaca-fusion.html",  "2026-04-07-mobile-dashboard.html",  "2026-04-07-renaca-wallpaper-mobile.html",  "2026-04-07-renaca-wallpaper.html",  "2026-04-07-reporte-gerencial-javier.html",  "2026-04-08-tsukai-chat-widget.html",  "2026-04-15_163000-facturas-desktop.html",  "2026-04-15_164500-facturas-mobile.html",  "infopet-gerente.html",  "infopet-presentacion-comercial.html",  "infopet-presentacion-comercial_1.html",  "infopet-propuesta-economica.html",  "infopet-propuesta.html",  "infopet-propuesta_1.html",  "infopet-roadmap-2026-03-28.html",  "infopet_dashboard.html"];
+const grid = document.getElementById('grid');
+files.sort().reverse().forEach(f => {
+  const a = document.createElement('a'); a.href = f;
+  const name = f.replace(/\.html$/,'').replace(/^\d{4}-\d{2}-\d{2}[_-]?\d*-?/, '').replace(/-/g,' ');
+  const dateMatch = f.match(/^(\d{4}-\d{2}-\d{2})/);
+  a.innerHTML = '<div class="name">' + name + '</div>' + (dateMatch ? '<div class="date">' + dateMatch[1] + '</div>' : '');
+  grid.appendChild(a);
+});
+</script>
+</body>
+</html>
