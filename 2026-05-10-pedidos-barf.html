@@ -359,7 +359,7 @@
             <span class="clients-panel-title">Clientes esta semana</span>
             <div class="tab-bar">
               <button class="tab-btn active" id="tab-esp-btn" onclick="switchClientTab('esperados')">Esperados (4)</button>
-              <button class="tab-btn" id="tab-salt-btn" onclick="switchClientTab('saltados')">Saltados (25) ⚠</button>
+              <button class="tab-btn" id="tab-salt-btn" onclick="switchClientTab('saltados')" style="border-color:rgba(255,149,0,0.3);color:rgba(255,149,0,0.7)">En riesgo (25)</button>
             </div>
           </div>
           <div id="tab-esp"><div id="clientes-semana"></div></div>
@@ -594,7 +594,7 @@ function renderClientes() {
       <div class="client-avatar" style="background:rgba(255,149,0,0.15);color:#FF9500">${initials(c.nombre)}</div>
       <div style="overflow:hidden">
         <div class="client-name">${c.nombre}</div>
-        <div class="skipped-label">⚠ No vino · esperado ${c.prox_visita} · posible compra en otro lugar</div>
+        <div class="skipped-label">⚠ En riesgo · esperado ${c.prox_visita} · posible compra en otro lugar</div>
         <div class="client-meta">Cada ${c.intervalo.toFixed(0)} días · fav: ${flav}</div>
       </div>
       <div class="client-right">
