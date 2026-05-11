@@ -379,7 +379,7 @@
       <!-- Tabla de productos -->
       <div class="section-title">
         Pedido martes <span id="title-date"></span>
-        <span class="tag">SES α=0.3 · Cobertura 7 días</span>
+        <span class="tag">SES/Prom híbrido · 7 días · +1 seg. debut</span>
       </div>
 
       <div class="table-wrap">
@@ -407,7 +407,7 @@
           Período: <strong id="footer-period">—</strong> ·
           Costo estimado: <strong id="footer-costo">—</strong>
           <div style="font-size:11px;color:rgba(255,149,0,0.7);margin-top:4px">
-            ⚡ Solo se pide lo necesario para 7 días · sin sobrestock
+            ⚡ Solo se pide lo necesario para 7 días · sin sobrestock · Pollo y Vacuno incluyen +1 caja stock de seguridad (debut)
           </div>
         </div>
         <button class="btn-generate" onclick="generarPedido()">
@@ -463,8 +463,8 @@
 // demVenta: mejor modelo por SKU (backtesting walk-forward, MAPE mínimo)
 // stock: real Bsale API 2026-05-10 · demConsumo: promedio 4 semanas
 const PRODUCTS = [
-  { sku:'500',  nombre:'Dieta de Vacuno',   variante:'4 kg', demVenta:4.22, demConsumo:0.25, demNuevos:1.10, debut:true,  stock:0, costo:17100, modelo:'SES'      },
-  { sku:'499',  nombre:'Dieta de Pollo',    variante:'4 kg', demVenta:3.25, demConsumo:0.25, demNuevos:0.94, debut:true,  stock:0, costo:16800, modelo:'Promedio'  },
+  { sku:'500',  nombre:'Dieta de Vacuno',   variante:'4 kg', demVenta:4.22, demConsumo:0.25, demNuevos:1.10, debut:true,  stockSeg:1, stock:0, costo:17100, modelo:'SES'      },
+  { sku:'499',  nombre:'Dieta de Pollo',    variante:'4 kg', demVenta:3.25, demConsumo:0.25, demNuevos:0.94, debut:true,  stockSeg:1, stock:0, costo:16800, modelo:'Promedio'  },
   { sku:'494',  nombre:'Hueso Recreativo',  variante:'S',    demVenta:3.25, demConsumo:0.00, demNuevos:0.00, debut:false, stock:6, costo:2000,  modelo:'Promedio'  },
   { sku:'502',  nombre:'Dieta de Cordero',  variante:'4 kg', demVenta:2.75, demConsumo:0.25, demNuevos:0.16, debut:false, stock:0, costo:17500, modelo:'Promedio'  },
   { sku:'501',  nombre:'Dieta de Pavo',     variante:'4 kg', demVenta:2.00, demConsumo:0.25, demNuevos:0.00, debut:false, stock:1, costo:20000, modelo:'Promedio'  },
@@ -640,10 +640,11 @@ function fmtCLP(n) {
   return '$' + Math.round(n).toLocaleString('es-CL');
 }
 
-// ── Calcular pedido: max(0, ceil(demTotal - stock)) ──
+// ── Calcular pedido: max(0, ceil(demTotal + stockSeg - stock)) ──
+// stockSeg = 1 en productos debut para garantizar 1 caja disponible para nuevos compradores
 function calcPedir(p) {
   const demTotal = p.demVenta + p.demConsumo;
-  return Math.max(0, Math.ceil(demTotal - p.stock));
+  return Math.max(0, Math.ceil(demTotal + (p.stockSeg || 0) - p.stock));
 }
 
 function estadoPill(stock, demTotal) {
@@ -685,6 +686,7 @@ function renderTable() {
           oninput="updateTotals()"
           data-costo="${p.costo}"
           style="${pedir === 0 ? 'opacity:.4' : ''}">
+        ${p.stockSeg ? '<div style="font-size:9px;color:#34C759;margin-top:3px">+1 seg. debut</div>' : ''}
       </td>
     </tr>`;
   }).join('');
