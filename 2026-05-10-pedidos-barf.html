@@ -423,7 +423,7 @@ function renderTable() {
       <td>${estadoPill(p.stock, demTotal)}</td>
       <td class="td-num">
         <input class="qty-input" type="number" value="${pedir}" min="0"
-          onchange="updateTotals()"
+          oninput="updateTotals()"
           data-costo="${p.costo}"
           style="${pedir === 0 ? 'opacity:.4' : ''}">
       </td>
@@ -446,7 +446,7 @@ function updateTotals() {
     costo += q * parseFloat(inp.dataset.costo);
   });
   document.getElementById('kpi-pedir').textContent    = cajas;
-  document.getElementById('footer-cajas').textContent = cajas + ' cajas';
+  document.getElementById('footer-cajas').textContent = cajas;
   document.getElementById('footer-costo').textContent = fmtCLP(costo);
 }
 
