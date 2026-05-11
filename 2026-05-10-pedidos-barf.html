@@ -113,6 +113,24 @@
 
   /* ── Modelo tag ── */
   .model-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; background: rgba(90,200,250,0.1); color: #5AC8FA; padding: 3px 9px; border-radius: 20px; margin-left: 8px; }
+
+  /* ── Insight clientes nuevos ── */
+  .new-clients-card { background: rgba(52,199,89,0.06); border: 1px solid rgba(52,199,89,0.18); border-radius: 12px; padding: 14px 18px; margin-bottom: 18px; display: flex; align-items: flex-start; gap: 16px; }
+  .new-clients-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+  .new-clients-body { flex: 1; }
+  .new-clients-title { font-size: 13px; font-weight: 600; color: #34C759; margin-bottom: 6px; }
+  .new-clients-flavors { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .flavor-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; background: rgba(52,199,89,0.1); border: 1px solid rgba(52,199,89,0.2); color: rgba(255,255,255,0.8); padding: 3px 10px; border-radius: 20px; }
+  .flavor-chip .fc-count { font-weight: 700; color: #34C759; }
+  .flavor-chip.debut-star { border-color: rgba(52,199,89,0.5); background: rgba(52,199,89,0.18); }
+  .new-clients-note { font-size: 11px; color: rgba(255,255,255,0.35); }
+  .new-clients-stat { text-align: center; padding-left: 16px; border-left: 1px solid rgba(52,199,89,0.15); flex-shrink: 0; }
+  .new-clients-stat .ns-val { font-size: 26px; font-weight: 700; color: #34C759; }
+  .new-clients-stat .ns-lbl { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+
+  /* ── Badge debut en tabla ── */
+  .debut-badge { display: inline-flex; align-items: center; font-size: 9px; background: rgba(52,199,89,0.12); color: #34C759; padding: 1px 6px; border-radius: 20px; margin-left: 5px; font-weight: 600; letter-spacing: .02em; }
+  .td-new { text-align: right; font-size: 11px; color: rgba(52,199,89,0.7); font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
@@ -232,6 +250,27 @@
         </div>
       </div>
 
+      <!-- Insight clientes nuevos -->
+      <div class="new-clients-card">
+        <div class="new-clients-icon">🆕</div>
+        <div class="new-clients-body">
+          <div class="new-clients-title">Sabores de inicio — clientes nuevos (últ. 90 días)</div>
+          <div class="new-clients-flavors">
+            <div class="flavor-chip debut-star"><span class="fc-count">9</span> Vacuno ★</div>
+            <div class="flavor-chip debut-star"><span class="fc-count">9</span> Pollo ★</div>
+            <div class="flavor-chip"><span class="fc-count">4</span> Caja Mixta</div>
+            <div class="flavor-chip"><span class="fc-count">4</span> Salmón</div>
+            <div class="flavor-chip"><span class="fc-count">4</span> Cerdo</div>
+            <div class="flavor-chip"><span class="fc-count">2</span> Cordero</div>
+          </div>
+          <div class="new-clients-note">Vacuno y Pollo son los sabores de debut preferidos · demanda de nuevos ya incluida en proyección SES · ticket promedio $26.716</div>
+        </div>
+        <div class="new-clients-stat">
+          <div class="ns-val">42</div>
+          <div class="ns-lbl">clientes<br>nuevos</div>
+        </div>
+      </div>
+
       <!-- Alerta de entrega -->
       <div id="delivery-alert" style="background:rgba(255,149,0,0.08);border:1px solid rgba(255,149,0,0.25);border-radius:10px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
         <div style="display:flex;align-items:center;gap:10px;font-size:13px">
@@ -279,6 +318,7 @@
               <th class="td-num">Dem. semana</th>
               <th class="td-num">Consumo sem.</th>
               <th class="td-num">Total sem.</th>
+              <th class="td-num" title="Demanda atribuida a clientes nuevos (últimos 90 días) — ya incluida en Dem. semana">Nuevos/sem ℹ</th>
               <th class="td-num">Stock actual</th>
               <th class="td-num">Estado</th>
               <th class="td-num">Pedir</th>
@@ -309,13 +349,14 @@
 
 <script>
 // ── Datos mock (vendrán de Supabase en producción) ──
+// demNuevos: demanda semanal atribuida a clientes nuevos (últimos 90 días) — ya incluida en demVenta
 const PRODUCTS = [
-  { sku:'500', nombre:'Dieta de Vacuno',  variante:'4 kg', demVenta:4.2, demConsumo:1.1, stock:6,  costo:17100 },
-  { sku:'502', nombre:'Dieta de Cordero', variante:'4 kg', demVenta:3.6, demConsumo:0.8, stock:9,  costo:17500 },
-  { sku:'499', nombre:'Dieta de Pollo',   variante:'4 kg', demVenta:2.7, demConsumo:0.6, stock:3,  costo:16800 },
-  { sku:'503', nombre:'Dieta de Cerdo',   variante:'4 kg', demVenta:2.1, demConsumo:0.5, stock:11, costo:17000 },
-  { sku:'501', nombre:'Dieta de Salmón',  variante:'4 kg', demVenta:1.7, demConsumo:0.4, stock:5,  costo:18200 },
-  { sku:'1883',nombre:'Caja Barf 4 KG',  variante:'Mixta',demVenta:1.2, demConsumo:0.3, stock:4,  costo:26500 },
+  { sku:'500', nombre:'Dieta de Vacuno',  variante:'4 kg', demVenta:4.2, demConsumo:1.1, demNuevos:1.10, debut:true,  stock:6,  costo:17100 },
+  { sku:'502', nombre:'Dieta de Cordero', variante:'4 kg', demVenta:3.6, demConsumo:0.8, demNuevos:0.16, debut:false, stock:9,  costo:17500 },
+  { sku:'499', nombre:'Dieta de Pollo',   variante:'4 kg', demVenta:2.7, demConsumo:0.6, demNuevos:0.94, debut:true,  stock:3,  costo:16800 },
+  { sku:'503', nombre:'Dieta de Cerdo',   variante:'4 kg', demVenta:2.1, demConsumo:0.5, demNuevos:0.47, debut:false, stock:11, costo:17000 },
+  { sku:'501', nombre:'Dieta de Salmón',  variante:'4 kg', demVenta:1.7, demConsumo:0.4, demNuevos:0.39, debut:false, stock:5,  costo:18200 },
+  { sku:'1883',nombre:'Caja Barf 4 KG',  variante:'Mixta',demVenta:1.2, demConsumo:0.3, demNuevos:0.47, debut:false, stock:4,  costo:26500 },
 ];
 
 // ── Calcular próximo martes ──
@@ -363,14 +404,16 @@ function renderTable() {
     totalVentas  += p.demVenta;
     totalConsumo += p.demConsumo;
 
+    const debutBadge = p.debut ? '<span class="debut-badge">★ debut</span>' : '';
     return `<tr>
       <td><div class="td-product">
-        <span class="pname">${p.nombre}</span>
+        <span class="pname">${p.nombre}${debutBadge}</span>
         <span class="psku">SKU ${p.sku} · ${p.variante}</span>
       </div></td>
       <td class="td-num">${p.demVenta.toFixed(1)}</td>
       <td class="td-num">${p.demConsumo.toFixed(1)}</td>
       <td class="td-demand">${demTotal.toFixed(1)}</td>
+      <td class="td-new">${p.demNuevos > 0 ? '+' + p.demNuevos.toFixed(2) : '—'}</td>
       <td class="td-num">${p.stock}</td>
       <td>${estadoPill(p.stock, demTotal)}</td>
       <td class="td-num">
