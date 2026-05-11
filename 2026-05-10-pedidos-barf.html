@@ -149,6 +149,33 @@
   /* ── Badge debut en tabla ── */
   .debut-badge { display: inline-flex; align-items: center; font-size: 9px; background: rgba(52,199,89,0.12); color: #34C759; padding: 1px 6px; border-radius: 20px; margin-left: 5px; font-weight: 600; letter-spacing: .02em; }
   .td-new { text-align: right; font-size: 11px; color: rgba(52,199,89,0.7); font-variant-numeric: tabular-nums; }
+  .model-badge { display: inline-flex; font-size: 9px; padding: 1px 5px; border-radius: 4px; font-weight: 600; margin-left: 4px; vertical-align: middle; }
+  .model-ses  { background: rgba(90,200,250,0.15); color: #5AC8FA; }
+  .model-avg  { background: rgba(255,149,0,0.15);  color: #FF9500; }
+
+  /* ── Tabs clientes ── */
+  .tab-bar { display: flex; gap: 4px; }
+  .tab-btn { font-size: 11px; padding: 3px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: rgba(255,255,255,0.4); cursor: pointer; transition: all .15s; }
+  .tab-btn.active { background: rgba(45,106,79,0.25); border-color: rgba(45,106,79,0.4); color: #6cdc8f; }
+  .client-row.skipped { opacity: .6; }
+  .skipped-label { font-size: 10px; color: #FF9500; margin-top: 2px; }
+
+  /* ── Panel diagnóstico modelo ── */
+  .diagnostico { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; margin-top: 20px; overflow: hidden; }
+  .diagnostico-header { padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
+  .diagnostico-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 8px; }
+  .diagnostico-body { padding: 0 16px 16px; display: none; }
+  .diagnostico-body.open { display: block; }
+  .mape-bar-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .mape-label { font-size: 11px; color: rgba(255,255,255,0.5); width: 60px; text-align: right; }
+  .mape-bar-bg { flex: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+  .mape-bar-fill { height: 100%; border-radius: 3px; }
+  .mape-val { font-size: 11px; font-weight: 600; width: 40px; }
+  .prec-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 12px; }
+  .prec-table th { padding: 6px 8px; text-align: left; color: rgba(255,255,255,0.3); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .prec-table td { padding: 7px 8px; border-bottom: 1px solid rgba(255,255,255,0.04); color: rgba(255,255,255,0.75); }
+  .prec-table tr:last-child td { border-bottom: none; }
+  .mejor-badge { font-size: 10px; padding: 1px 6px; border-radius: 4px; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -326,13 +353,17 @@
       <!-- Clientes esperados + Top 3 -->
       <div class="clients-grid">
 
-        <!-- Esperados esta semana -->
+        <!-- Esperados / Saltados esta semana -->
         <div class="clients-panel">
           <div class="clients-panel-header">
-            <span class="clients-panel-title">Clientes esperados esta semana</span>
-            <span class="clients-panel-badge" id="badge-esperados">4 clientes</span>
+            <span class="clients-panel-title">Clientes esta semana</span>
+            <div class="tab-bar">
+              <button class="tab-btn active" id="tab-esp-btn" onclick="switchClientTab('esperados')">Esperados (4)</button>
+              <button class="tab-btn" id="tab-salt-btn" onclick="switchClientTab('saltados')">Saltados (25) ⚠</button>
+            </div>
           </div>
-          <div id="clientes-semana"></div>
+          <div id="tab-esp"><div id="clientes-semana"></div></div>
+          <div id="tab-salt" style="display:none"><div id="clientes-saltados"></div></div>
         </div>
 
         <!-- Top 3 compradores -->
@@ -384,24 +415,88 @@
         </button>
       </div>
 
+      <!-- Diagnóstico del modelo -->
+      <div class="diagnostico">
+        <div class="diagnostico-header" onclick="toggleDiag()">
+          <div class="diagnostico-title">
+            <span>🔬</span> Diagnóstico del modelo de demanda
+            <span class="model-tag">Híbrido por SKU</span>
+          </div>
+          <span id="diag-arrow" style="color:rgba(255,255,255,0.3);font-size:12px">▼ Ver detalle</span>
+        </div>
+        <div class="diagnostico-body" id="diag-body">
+          <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px">
+            Backtesting walk-forward, últimas 8 semanas. Cada SKU usa el modelo con menor MAPE histórico. Naive descartado (85.7% error promedio).
+          </p>
+          <!-- Barras MAPE global -->
+          <div class="mape-bar-wrap">
+            <span class="mape-label">SES</span>
+            <div class="mape-bar-bg"><div class="mape-bar-fill" style="width:60.4%;background:#5AC8FA"></div></div>
+            <span class="mape-val" style="color:#5AC8FA">60.4%</span>
+            <span style="font-size:10px;color:rgba(255,255,255,0.3)">5/10 SKUs</span>
+          </div>
+          <div class="mape-bar-wrap">
+            <span class="mape-label">Promedio</span>
+            <div class="mape-bar-bg"><div class="mape-bar-fill" style="width:61.7%;background:#FF9500"></div></div>
+            <span class="mape-val" style="color:#FF9500">61.7%</span>
+            <span style="font-size:10px;color:rgba(255,255,255,0.3)">5/10 SKUs</span>
+          </div>
+          <div class="mape-bar-wrap">
+            <span class="mape-label">Naive</span>
+            <div class="mape-bar-bg"><div class="mape-bar-fill" style="width:85.7%;background:rgba(255,255,255,0.2)"></div></div>
+            <span class="mape-val" style="color:rgba(255,255,255,0.35)">85.7%</span>
+            <span style="font-size:10px;color:rgba(255,59,48,0.6)">0/10 SKUs</span>
+          </div>
+          <!-- Tabla por SKU -->
+          <table class="prec-table" id="prec-table"></table>
+          <p style="font-size:11px;color:rgba(255,149,0,0.6);margin-top:10px">
+            ⚡ Producto debut recomendado para clientes nuevos: <strong style="color:#FF9500">Pollo (SKU 499)</strong> y <strong style="color:#FF9500">Vacuno (SKU 500)</strong> — elegidos en 1ª compra en 56/128 debuts registrados.
+          </p>
+        </div>
+      </div>
+
     </div><!-- /view-detail -->
   </div><!-- /content -->
 </div><!-- /main -->
 
 <script>
-// demNuevos: demanda semanal atribuida a clientes nuevos (últimos 90 días) — ya incluida en demVenta
-// stock: real desde Bsale API (2026-05-10) · demVenta: SES α=0.3 últimas 8 semanas · demConsumo: promedio 4 semanas
+// demVenta: mejor modelo por SKU (backtesting walk-forward, MAPE mínimo)
+// stock: real Bsale API 2026-05-10 · demConsumo: promedio 4 semanas
 const PRODUCTS = [
-  { sku:'500',  nombre:'Dieta de Vacuno',    variante:'4 kg', demVenta:4.19, demConsumo:0.25, demNuevos:1.10, debut:true,  stock:0, costo:17100 },
-  { sku:'499',  nombre:'Dieta de Pollo',     variante:'4 kg', demVenta:3.29, demConsumo:0.25, demNuevos:0.94, debut:true,  stock:0, costo:16800 },
-  { sku:'502',  nombre:'Dieta de Cordero',   variante:'4 kg', demVenta:2.74, demConsumo:0.25, demNuevos:0.16, debut:false, stock:0, costo:17500 },
-  { sku:'503',  nombre:'Dieta de Salmón',    variante:'4 kg', demVenta:2.03, demConsumo:0.25, demNuevos:0.39, debut:false, stock:1, costo:17000 },
-  { sku:'501',  nombre:'Dieta de Pavo',      variante:'4 kg', demVenta:1.73, demConsumo:0.25, demNuevos:0.00, debut:false, stock:1, costo:20000 },
-  { sku:'494',  nombre:'Hueso Recreativo',   variante:'S',    demVenta:2.69, demConsumo:0.00, demNuevos:0.00, debut:false, stock:6, costo:2000  },
-  { sku:'495',  nombre:'Hueso Recreativo',   variante:'XL',   demVenta:1.26, demConsumo:0.00, demNuevos:0.00, debut:false, stock:2, costo:3000  },
-  { sku:'504',  nombre:'Dieta de Cerdo',     variante:'4 kg', demVenta:0.81, demConsumo:0.50, demNuevos:0.47, debut:false, stock:1, costo:16500 },
-  { sku:'1883', nombre:'Cocido de Vacuno',   variante:'4 kg', demVenta:0.56, demConsumo:0.00, demNuevos:0.47, debut:false, stock:1, costo:26500 },
-  { sku:'1884', nombre:'Cocido de Pollo',    variante:'4 kg', demVenta:0.21, demConsumo:0.00, demNuevos:0.00, debut:false, stock:0, costo:26500 },
+  { sku:'500',  nombre:'Dieta de Vacuno',   variante:'4 kg', demVenta:4.22, demConsumo:0.25, demNuevos:1.10, debut:true,  stock:0, costo:17100, modelo:'SES'      },
+  { sku:'499',  nombre:'Dieta de Pollo',    variante:'4 kg', demVenta:3.25, demConsumo:0.25, demNuevos:0.94, debut:true,  stock:0, costo:16800, modelo:'Promedio'  },
+  { sku:'494',  nombre:'Hueso Recreativo',  variante:'S',    demVenta:3.25, demConsumo:0.00, demNuevos:0.00, debut:false, stock:6, costo:2000,  modelo:'Promedio'  },
+  { sku:'502',  nombre:'Dieta de Cordero',  variante:'4 kg', demVenta:2.75, demConsumo:0.25, demNuevos:0.16, debut:false, stock:0, costo:17500, modelo:'Promedio'  },
+  { sku:'501',  nombre:'Dieta de Pavo',     variante:'4 kg', demVenta:2.00, demConsumo:0.25, demNuevos:0.00, debut:false, stock:1, costo:20000, modelo:'Promedio'  },
+  { sku:'503',  nombre:'Dieta de Salmón',   variante:'4 kg', demVenta:1.72, demConsumo:0.25, demNuevos:0.39, debut:false, stock:1, costo:17000, modelo:'SES'       },
+  { sku:'495',  nombre:'Hueso Recreativo',  variante:'XL',   demVenta:1.18, demConsumo:0.00, demNuevos:0.00, debut:false, stock:2, costo:3000,  modelo:'SES'       },
+  { sku:'504',  nombre:'Dieta de Cerdo',    variante:'4 kg', demVenta:0.75, demConsumo:0.50, demNuevos:0.47, debut:false, stock:1, costo:16500, modelo:'Promedio'  },
+  { sku:'1883', nombre:'Cocido de Vacuno',  variante:'4 kg', demVenta:0.58, demConsumo:0.00, demNuevos:0.47, debut:false, stock:1, costo:26500, modelo:'SES'       },
+  { sku:'1884', nombre:'Cocido de Pollo',   variante:'4 kg', demVenta:0.22, demConsumo:0.00, demNuevos:0.00, debut:false, stock:0, costo:26500, modelo:'SES'       },
+];
+
+// Precisión por SKU (backtesting)
+const MODELO_PREC = [
+  { sku:'500',  nombre:'Dieta de Vacuno',  mejor:'SES',      ses:25.6,  avg:25.9,  naive:39.2  },
+  { sku:'499',  nombre:'Dieta de Pollo',   mejor:'Promedio', ses:77.3,  avg:74.1,  naive:102.7 },
+  { sku:'494',  nombre:'Hueso Recr. S',    mejor:'Promedio', ses:42.8,  avg:36.3,  naive:73.3  },
+  { sku:'502',  nombre:'Dieta de Cordero', mejor:'Promedio', ses:77.4,  avg:71.1,  naive:106.2 },
+  { sku:'501',  nombre:'Dieta de Pavo',    mejor:'Promedio', ses:70.0,  avg:67.0,  naive:103.6 },
+  { sku:'503',  nombre:'Dieta de Salmón',  mejor:'SES',      ses:56.8,  avg:75.9,  naive:67.9  },
+  { sku:'495',  nombre:'Hueso Recr. XL',   mejor:'SES',      ses:62.3,  avg:67.7,  naive:87.5  },
+  { sku:'504',  nombre:'Dieta de Cerdo',   mejor:'Promedio', ses:42.1,  avg:40.8,  naive:110.0 },
+  { sku:'1883', nombre:'Cocido Vacuno',     mejor:'SES',      ses:52.0,  avg:58.3,  naive:66.7  },
+  { sku:'1884', nombre:'Cocido Pollo',      mejor:'SES',      ses:97.5,  avg:100.0, naive:100.0 },
+];
+
+// Clientes saltados recientes (< 60 días, sin "sin nombre")
+const SALTADOS = [
+  { nombre:'Anabella Jimenez',    prox_visita:'2026-05-09', dias_sin_compra:32, intervalo:31.5, neto_total:152562, sku_favorito:'500' },
+  { nombre:'German Weber',        prox_visita:'2026-05-04', dias_sin_compra:26, intervalo:20.6, neto_total:197631, sku_favorito:'487' },
+  { nombre:'Maria Soledad Poveda',prox_visita:'2026-05-04', dias_sin_compra:38, intervalo:32.5, neto_total:77706,  sku_favorito:'500' },
+  { nombre:'Rodrigo Azua',        prox_visita:'2026-05-03', dias_sin_compra:23, intervalo:16.8, neto_total:274020, sku_favorito:'504' },
+  { nombre:'Andrea Reusser',      prox_visita:'2026-05-01', dias_sin_compra:31, intervalo:22.0, neto_total:48722,  sku_favorito:'503' },
+  { nombre:'Fabian Elorriaga',    prox_visita:'2026-04-28', dias_sin_compra:27, intervalo:22.5, neto_total:49450,  sku_favorito:'489' },
 ];
 
 // ── Mapeo SKU → nombre corto ──
@@ -430,6 +525,45 @@ function initials(nombre) {
   return nombre.trim().split(/\s+/).slice(0,2).map(w => w[0].toUpperCase()).join('');
 }
 
+function switchClientTab(tab) {
+  document.getElementById('tab-esp').style.display  = tab==='esperados' ? 'block' : 'none';
+  document.getElementById('tab-salt').style.display = tab==='saltados'  ? 'block' : 'none';
+  document.getElementById('tab-esp-btn').classList.toggle('active',  tab==='esperados');
+  document.getElementById('tab-salt-btn').classList.toggle('active', tab==='saltados');
+}
+
+function toggleDiag() {
+  const body  = document.getElementById('diag-body');
+  const arrow = document.getElementById('diag-arrow');
+  const open  = body.classList.toggle('open');
+  arrow.textContent = open ? '▲ Ocultar' : '▼ Ver detalle';
+}
+
+function renderPrecision() {
+  const tbl = document.getElementById('prec-table');
+  tbl.innerHTML = `<thead><tr>
+    <th>SKU</th><th>Producto</th>
+    <th style="text-align:right">MAPE SES</th>
+    <th style="text-align:right">MAPE Prom.</th>
+    <th style="text-align:right">MAPE Naive</th>
+    <th style="text-align:center">Modelo usado</th>
+  </tr></thead><tbody>` +
+  MODELO_PREC.map(r => {
+    const cls  = r.mejor==='SES' ? 'model-ses' : 'model-avg';
+    const best = (mape, modelo) => r.mejor===modelo
+      ? `<strong style="color:${modelo==='SES'?'#5AC8FA':'#FF9500'}">${mape}%</strong>`
+      : `${mape}%`;
+    return `<tr>
+      <td style="color:rgba(255,255,255,0.4)">${r.sku}</td>
+      <td>${r.nombre}</td>
+      <td style="text-align:right">${best(r.ses,'SES')}</td>
+      <td style="text-align:right">${best(r.avg,'Promedio')}</td>
+      <td style="text-align:right;color:rgba(255,255,255,0.3)">${r.naive}%</td>
+      <td style="text-align:center"><span class="mejor-badge model-badge ${cls}">${r.mejor}</span></td>
+    </tr>`;
+  }).join('') + '</tbody>';
+}
+
 function renderClientes() {
   const hoy = new Date(); hoy.setHours(0,0,0,0);
 
@@ -448,6 +582,23 @@ function renderClientes() {
       </div>
       <div class="client-right">
         <div class="${cls}">${txt}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:2px">${fmtCLP(c.neto_total)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Saltados
+  document.getElementById('clientes-saltados').innerHTML = SALTADOS.map(c => {
+    const flav = SKU_NAMES[c.sku_favorito] || c.sku_favorito;
+    return `<div class="client-row skipped">
+      <div class="client-avatar" style="background:rgba(255,149,0,0.15);color:#FF9500">${initials(c.nombre)}</div>
+      <div style="overflow:hidden">
+        <div class="client-name">${c.nombre}</div>
+        <div class="skipped-label">⚠ No vino · esperado ${c.prox_visita} · posible compra en otro lugar</div>
+        <div class="client-meta">Cada ${c.intervalo.toFixed(0)} días · fav: ${flav}</div>
+      </div>
+      <div class="client-right">
+        <div style="font-size:12px;font-weight:700;color:#FF9500">${c.dias_sin_compra}d sin comprar</div>
         <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:2px">${fmtCLP(c.neto_total)}</div>
       </div>
     </div>`;
@@ -516,13 +667,14 @@ function renderTable() {
     totalVentas  += p.demVenta;
     totalConsumo += p.demConsumo;
 
-    const debutBadge = p.debut ? '<span class="debut-badge">★ debut</span>' : '';
+    const debutBadge  = p.debut ? '<span class="debut-badge">★ debut</span>' : '';
+    const modeloBadge = `<span class="model-badge model-${p.modelo==='SES'?'ses':'avg'}">${p.modelo}</span>`;
     return `<tr>
       <td><div class="td-product">
         <span class="pname">${p.nombre}${debutBadge}</span>
         <span class="psku">SKU ${p.sku} · ${p.variante}</span>
       </div></td>
-      <td class="td-num">${p.demVenta.toFixed(1)}</td>
+      <td class="td-num">${p.demVenta.toFixed(1)} ${modeloBadge}</td>
       <td class="td-num">${p.demConsumo.toFixed(1)}</td>
       <td class="td-demand">${demTotal.toFixed(1)}</td>
       <td class="td-new">${p.demNuevos > 0 ? '+' + p.demNuevos.toFixed(2) : '—'}</td>
@@ -578,6 +730,7 @@ function showDetail() {
   initDates();
   renderTable();
   renderClientes();
+  renderPrecision();
 }
 
 function showProviders() {
