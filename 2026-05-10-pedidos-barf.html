@@ -187,7 +187,7 @@
           <span class="provider-badge badge-active">Activo</span>
           <div class="provider-icon" style="background:rgba(52,199,89,0.1)">🥩</div>
           <div class="provider-name">Barf Chile</div>
-          <div class="provider-meta">Comida húmeda · 8 productos activos</div>
+          <div class="provider-meta">Comida húmeda · 10 productos activos</div>
           <div class="provider-stats">
             <div class="pstat">
               <div class="pstat-val">39</div>
@@ -239,7 +239,7 @@
         <div class="detail-icon">🥩</div>
         <div>
           <div class="detail-title">Barf Chile</div>
-          <div class="detail-sub">Comida húmeda · Última sync: hoy 08:45
+          <div class="detail-sub">Comida húmeda · 10 productos · Stock sincronizado: hoy 10 may 2026
             <span class="model-tag">⚡ SES + Frecuencia</span>
           </div>
         </div>
@@ -258,10 +258,11 @@
           <div class="new-clients-flavors">
             <div class="flavor-chip debut-star"><span class="fc-count">9</span> Vacuno ★</div>
             <div class="flavor-chip debut-star"><span class="fc-count">9</span> Pollo ★</div>
-            <div class="flavor-chip"><span class="fc-count">4</span> Caja Mixta</div>
+            <div class="flavor-chip"><span class="fc-count">4</span> Cocido Vacuno</div>
+            <div class="flavor-chip"><span class="fc-count">4</span> Pavo</div>
             <div class="flavor-chip"><span class="fc-count">4</span> Salmón</div>
-            <div class="flavor-chip"><span class="fc-count">4</span> Cerdo</div>
             <div class="flavor-chip"><span class="fc-count">2</span> Cordero</div>
+            <div class="flavor-chip"><span class="fc-count">2</span> Hueso S/XL</div>
           </div>
           <div class="new-clients-note">Vacuno y Pollo son los sabores de debut preferidos · demanda de nuevos ya incluida en proyección SES · ticket promedio $26.716</div>
         </div>
@@ -348,15 +349,19 @@
 </div><!-- /main -->
 
 <script>
-// ── Datos mock (vendrán de Supabase en producción) ──
 // demNuevos: demanda semanal atribuida a clientes nuevos (últimos 90 días) — ya incluida en demVenta
+// stock: real desde Bsale API (2026-05-10) · demVenta: SES α=0.3 últimas 8 semanas · demConsumo: promedio 4 semanas
 const PRODUCTS = [
-  { sku:'500', nombre:'Dieta de Vacuno',  variante:'4 kg', demVenta:4.2, demConsumo:1.1, demNuevos:1.10, debut:true,  stock:6,  costo:17100 },
-  { sku:'502', nombre:'Dieta de Cordero', variante:'4 kg', demVenta:3.6, demConsumo:0.8, demNuevos:0.16, debut:false, stock:9,  costo:17500 },
-  { sku:'499', nombre:'Dieta de Pollo',   variante:'4 kg', demVenta:2.7, demConsumo:0.6, demNuevos:0.94, debut:true,  stock:3,  costo:16800 },
-  { sku:'503', nombre:'Dieta de Cerdo',   variante:'4 kg', demVenta:2.1, demConsumo:0.5, demNuevos:0.47, debut:false, stock:11, costo:17000 },
-  { sku:'501', nombre:'Dieta de Salmón',  variante:'4 kg', demVenta:1.7, demConsumo:0.4, demNuevos:0.39, debut:false, stock:5,  costo:18200 },
-  { sku:'1883',nombre:'Caja Barf 4 KG',  variante:'Mixta',demVenta:1.2, demConsumo:0.3, demNuevos:0.47, debut:false, stock:4,  costo:26500 },
+  { sku:'500',  nombre:'Dieta de Vacuno',    variante:'4 kg', demVenta:4.19, demConsumo:0.25, demNuevos:1.10, debut:true,  stock:0, costo:17100 },
+  { sku:'499',  nombre:'Dieta de Pollo',     variante:'4 kg', demVenta:3.29, demConsumo:0.25, demNuevos:0.94, debut:true,  stock:0, costo:16800 },
+  { sku:'502',  nombre:'Dieta de Cordero',   variante:'4 kg', demVenta:2.74, demConsumo:0.25, demNuevos:0.16, debut:false, stock:0, costo:17500 },
+  { sku:'503',  nombre:'Dieta de Salmón',    variante:'4 kg', demVenta:2.03, demConsumo:0.25, demNuevos:0.39, debut:false, stock:1, costo:17000 },
+  { sku:'501',  nombre:'Dieta de Pavo',      variante:'4 kg', demVenta:1.73, demConsumo:0.25, demNuevos:0.00, debut:false, stock:1, costo:20000 },
+  { sku:'494',  nombre:'Hueso Recreativo',   variante:'S',    demVenta:2.69, demConsumo:0.00, demNuevos:0.00, debut:false, stock:6, costo:2000  },
+  { sku:'495',  nombre:'Hueso Recreativo',   variante:'XL',   demVenta:1.26, demConsumo:0.00, demNuevos:0.00, debut:false, stock:2, costo:3000  },
+  { sku:'504',  nombre:'Dieta de Cerdo',     variante:'4 kg', demVenta:0.81, demConsumo:0.50, demNuevos:0.47, debut:false, stock:1, costo:16500 },
+  { sku:'1883', nombre:'Cocido de Vacuno',   variante:'4 kg', demVenta:0.56, demConsumo:0.00, demNuevos:0.47, debut:false, stock:1, costo:26500 },
+  { sku:'1884', nombre:'Cocido de Pollo',    variante:'4 kg', demVenta:0.21, demConsumo:0.00, demNuevos:0.00, debut:false, stock:0, costo:26500 },
 ];
 
 // ── Calcular próximo martes ──
