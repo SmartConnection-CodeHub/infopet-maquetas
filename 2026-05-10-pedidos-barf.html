@@ -232,34 +232,43 @@
         </div>
       </div>
 
+      <!-- Alerta de entrega -->
+      <div id="delivery-alert" style="background:rgba(255,149,0,0.08);border:1px solid rgba(255,149,0,0.25);border-radius:10px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px">
+          <span style="font-size:18px">🚚</span>
+          <span>Próxima entrega: <strong style="color:#FF9500" id="next-tuesday"></strong> &nbsp;·&nbsp; Período cubierto: <strong id="cover-period" style="color:rgba(255,255,255,0.8)"></strong></span>
+        </div>
+        <span id="days-counter" style="font-size:12px;background:rgba(255,149,0,0.15);color:#FF9500;padding:4px 10px;border-radius:20px;font-weight:600"></span>
+      </div>
+
       <!-- KPIs -->
       <div class="kpis">
         <div class="kpi kpi-blue">
-          <div class="kpi-label">Demanda semanal</div>
-          <div class="kpi-value">11.4</div>
-          <div class="kpi-sub">cajas/semana promedio</div>
+          <div class="kpi-label">Demanda venta / semana</div>
+          <div class="kpi-value" id="kpi-ventas">11.4</div>
+          <div class="kpi-sub">cajas · modelo SES</div>
         </div>
         <div class="kpi kpi-amber">
-          <div class="kpi-label">Consumo interno</div>
-          <div class="kpi-value">3.2</div>
-          <div class="kpi-sub">cajas/semana</div>
+          <div class="kpi-label">Consumo interno / semana</div>
+          <div class="kpi-value" id="kpi-consumo">3.2</div>
+          <div class="kpi-sub">cajas · promedio 4 semanas</div>
         </div>
         <div class="kpi kpi-green">
-          <div class="kpi-label">Demanda total</div>
-          <div class="kpi-value">14.6</div>
-          <div class="kpi-sub">cajas/semana (ventas + consumo)</div>
+          <div class="kpi-label">Demanda total semana</div>
+          <div class="kpi-value" id="kpi-total">14.6</div>
+          <div class="kpi-sub">ventas + consumo interno</div>
         </div>
         <div class="kpi">
-          <div class="kpi-label">Días de cobertura</div>
-          <div class="kpi-value">12</div>
-          <div class="kpi-sub">con stock actual</div>
+          <div class="kpi-label">A pedir esta semana</div>
+          <div class="kpi-value" id="kpi-pedir" style="color:#FF9500">—</div>
+          <div class="kpi-sub">cajas · flujo de caja optimizado</div>
         </div>
       </div>
 
       <!-- Tabla de productos -->
       <div class="section-title">
-        Recomendación de pedido
-        <span class="tag">Modelo SES · α=0.3</span>
+        Pedido martes <span id="title-date"></span>
+        <span class="tag">SES α=0.3 · Cobertura 7 días</span>
       </div>
 
       <div class="table-wrap">
@@ -267,80 +276,29 @@
           <thead>
             <tr>
               <th>Producto</th>
-              <th class="td-num">Ventas 30d</th>
-              <th class="td-num">Consumos 30d</th>
-              <th class="td-num">Demanda SES</th>
-              <th class="td-num">Stock</th>
+              <th class="td-num">Dem. semana</th>
+              <th class="td-num">Consumo sem.</th>
+              <th class="td-num">Total sem.</th>
+              <th class="td-num">Stock actual</th>
               <th class="td-num">Estado</th>
-              <th class="td-num">Pedir (cajas)</th>
+              <th class="td-num">Pedir</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td><div class="td-product"><span class="pname">Dieta de Vacuno</span><span class="psku">SKU 500 · 4 kg</span></div></td>
-              <td class="td-num">14</td>
-              <td class="td-num">4</td>
-              <td class="td-demand">4.2</td>
-              <td class="td-num">6</td>
-              <td><span class="pill pill-amber">Bajo</span></td>
-              <td class="td-num"><input class="qty-input" type="number" value="8" min="0"></td>
-            </tr>
-            <tr>
-              <td><div class="td-product"><span class="pname">Dieta de Cordero</span><span class="psku">SKU 502 · 4 kg</span></div></td>
-              <td class="td-num">12</td>
-              <td class="td-num">3</td>
-              <td class="td-demand">3.6</td>
-              <td class="td-num">9</td>
-              <td><span class="pill pill-green">Normal</span></td>
-              <td class="td-num"><input class="qty-input" type="number" value="6" min="0"></td>
-            </tr>
-            <tr>
-              <td><div class="td-product"><span class="pname">Dieta de Pollo</span><span class="psku">SKU 499 · 4 kg</span></div></td>
-              <td class="td-num">9</td>
-              <td class="td-num">2</td>
-              <td class="td-demand">2.7</td>
-              <td class="td-num">3</td>
-              <td><span class="pill pill-red">Crítico</span></td>
-              <td class="td-num"><input class="qty-input" type="number" value="10" min="0"></td>
-            </tr>
-            <tr>
-              <td><div class="td-product"><span class="pname">Dieta de Cerdo</span><span class="psku">SKU 503 · 4 kg</span></div></td>
-              <td class="td-num">7</td>
-              <td class="td-num">2</td>
-              <td class="td-demand">2.1</td>
-              <td class="td-num">11</td>
-              <td><span class="pill pill-green">Normal</span></td>
-              <td class="td-num"><input class="qty-input" type="number" value="4" min="0"></td>
-            </tr>
-            <tr>
-              <td><div class="td-product"><span class="pname">Dieta de Salmón</span><span class="psku">SKU 501 · 4 kg</span></div></td>
-              <td class="td-num">6</td>
-              <td class="td-num">1</td>
-              <td class="td-demand">1.7</td>
-              <td class="td-num">5</td>
-              <td><span class="pill pill-amber">Bajo</span></td>
-              <td class="td-num"><input class="qty-input" type="number" value="5" min="0"></td>
-            </tr>
-            <tr>
-              <td><div class="td-product"><span class="pname">Caja Barf 4 KG</span><span class="psku">SKU 1883 · Mixta</span></div></td>
-              <td class="td-num">4</td>
-              <td class="td-num">1</td>
-              <td class="td-demand">1.2</td>
-              <td class="td-num">4</td>
-              <td><span class="pill pill-amber">Bajo</span></td>
-              <td class="td-num"><input class="qty-input" type="number" value="3" min="0"></td>
-            </tr>
-          </tbody>
+          <tbody id="products-tbody"></tbody>
         </table>
       </div>
 
       <!-- Footer del pedido -->
       <div class="order-footer">
         <div class="order-footer-info">
-          <strong>36 cajas</strong> en total · Cobertura estimada: <strong>18 días</strong> ·
-          Costo estimado: <strong>$612.000</strong>
+          <strong id="footer-cajas">—</strong> cajas en total ·
+          Período: <strong id="footer-period">—</strong> ·
+          Costo estimado: <strong id="footer-costo">—</strong>
+          <div style="font-size:11px;color:rgba(255,149,0,0.7);margin-top:4px">
+            ⚡ Solo se pide lo necesario para 7 días · sin sobrestock
+          </div>
         </div>
-        <button class="btn-generate" onclick="alert('Pedido generado y guardado en Supabase.')">
+        <button class="btn-generate" onclick="generarPedido()">
           📋 Generar pedido
         </button>
       </div>
@@ -350,15 +308,133 @@
 </div><!-- /main -->
 
 <script>
+// ── Datos mock (vendrán de Supabase en producción) ──
+const PRODUCTS = [
+  { sku:'500', nombre:'Dieta de Vacuno',  variante:'4 kg', demVenta:4.2, demConsumo:1.1, stock:6,  costo:17100 },
+  { sku:'502', nombre:'Dieta de Cordero', variante:'4 kg', demVenta:3.6, demConsumo:0.8, stock:9,  costo:17500 },
+  { sku:'499', nombre:'Dieta de Pollo',   variante:'4 kg', demVenta:2.7, demConsumo:0.6, stock:3,  costo:16800 },
+  { sku:'503', nombre:'Dieta de Cerdo',   variante:'4 kg', demVenta:2.1, demConsumo:0.5, stock:11, costo:17000 },
+  { sku:'501', nombre:'Dieta de Salmón',  variante:'4 kg', demVenta:1.7, demConsumo:0.4, stock:5,  costo:18200 },
+  { sku:'1883',nombre:'Caja Barf 4 KG',  variante:'Mixta',demVenta:1.2, demConsumo:0.3, stock:4,  costo:26500 },
+];
+
+// ── Calcular próximo martes ──
+function nextTuesday(from) {
+  const d = new Date(from);
+  const day = d.getDay(); // 0=dom, 2=mar
+  const daysUntil = (2 - day + 7) % 7 || 7;
+  d.setDate(d.getDate() + daysUntil);
+  d.setHours(0,0,0,0);
+  return d;
+}
+
+function fmtDate(d) {
+  return d.toLocaleDateString('es-CL', { weekday:'short', day:'numeric', month:'short' });
+}
+
+function fmtCLP(n) {
+  return '$' + Math.round(n).toLocaleString('es-CL');
+}
+
+// ── Calcular pedido: max(0, ceil(demTotal - stock)) ──
+function calcPedir(p) {
+  const demTotal = p.demVenta + p.demConsumo;
+  return Math.max(0, Math.ceil(demTotal - p.stock));
+}
+
+function estadoPill(stock, demTotal) {
+  if (stock <= 0)         return '<span class="pill pill-red">Sin stock</span>';
+  if (stock < demTotal * 0.5) return '<span class="pill pill-red">Crítico</span>';
+  if (stock < demTotal)   return '<span class="pill pill-amber">Bajo</span>';
+  return '<span class="pill pill-green">Normal</span>';
+}
+
+// ── Render tabla ──
+function renderTable() {
+  const tbody = document.getElementById('products-tbody');
+  let totalCajas = 0, totalCosto = 0;
+  let totalVentas = 0, totalConsumo = 0;
+
+  tbody.innerHTML = PRODUCTS.map(p => {
+    const demTotal = p.demVenta + p.demConsumo;
+    const pedir    = calcPedir(p);
+    totalCajas += pedir;
+    totalCosto += pedir * p.costo;
+    totalVentas  += p.demVenta;
+    totalConsumo += p.demConsumo;
+
+    return `<tr>
+      <td><div class="td-product">
+        <span class="pname">${p.nombre}</span>
+        <span class="psku">SKU ${p.sku} · ${p.variante}</span>
+      </div></td>
+      <td class="td-num">${p.demVenta.toFixed(1)}</td>
+      <td class="td-num">${p.demConsumo.toFixed(1)}</td>
+      <td class="td-demand">${demTotal.toFixed(1)}</td>
+      <td class="td-num">${p.stock}</td>
+      <td>${estadoPill(p.stock, demTotal)}</td>
+      <td class="td-num">
+        <input class="qty-input" type="number" value="${pedir}" min="0"
+          onchange="updateTotals()"
+          data-costo="${p.costo}"
+          style="${pedir === 0 ? 'opacity:.4' : ''}">
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('kpi-ventas').textContent  = totalVentas.toFixed(1);
+  document.getElementById('kpi-consumo').textContent = totalConsumo.toFixed(1);
+  document.getElementById('kpi-total').textContent   = (totalVentas + totalConsumo).toFixed(1);
+
+  updateTotals();
+}
+
+function updateTotals() {
+  const inputs = document.querySelectorAll('#products-tbody .qty-input');
+  let cajas = 0, costo = 0;
+  inputs.forEach(inp => {
+    const q = parseInt(inp.value) || 0;
+    cajas += q;
+    costo += q * parseFloat(inp.dataset.costo);
+  });
+  document.getElementById('kpi-pedir').textContent    = cajas;
+  document.getElementById('footer-cajas').textContent = cajas + ' cajas';
+  document.getElementById('footer-costo').textContent = fmtCLP(costo);
+}
+
+// ── Inicializar fechas ──
+function initDates() {
+  const hoy     = new Date();
+  const martes  = nextTuesday(hoy);
+  const martes2 = nextTuesday(new Date(martes.getTime() + 86400000));
+  const dias    = Math.round((martes - hoy) / 86400000);
+
+  document.getElementById('next-tuesday').textContent = fmtDate(martes);
+  document.getElementById('cover-period').textContent = fmtDate(martes) + ' → ' + fmtDate(martes2);
+  document.getElementById('days-counter').textContent = dias === 0 ? '¡Hoy!' : `en ${dias} día${dias>1?'s':''}`;
+  document.getElementById('title-date').textContent   = fmtDate(martes);
+  document.getElementById('footer-period').textContent= fmtDate(martes) + ' → ' + fmtDate(martes2);
+}
+
 function showDetail() {
   document.getElementById('view-providers').style.display = 'none';
   document.getElementById('view-detail').style.display = 'block';
   document.getElementById('topbar-title').textContent = 'Pedidos · Barf Chile';
+  initDates();
+  renderTable();
 }
+
 function showProviders() {
   document.getElementById('view-detail').style.display = 'none';
   document.getElementById('view-providers').style.display = 'block';
   document.getElementById('topbar-title').textContent = 'Pedidos';
+}
+
+function generarPedido() {
+  const inputs = document.querySelectorAll('#products-tbody .qty-input');
+  let total = 0;
+  inputs.forEach(i => total += parseInt(i.value)||0);
+  alert(`Pedido generado: ${total} cajas para el ${document.getElementById('next-tuesday').textContent}.\nGuardado en Supabase.`);
 }
 </script>
 </body>
