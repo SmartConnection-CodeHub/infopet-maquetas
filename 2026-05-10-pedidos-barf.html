@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InfoPet — Pedidos</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: #0C1210; color: #f1f5f9; display: flex; min-height: 100vh; }
+
+  /* ── Sidebar ── */
+  .sidebar { width: 220px; min-height: 100vh; background: rgba(255,255,255,0.03); border-right: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; flex-shrink: 0; }
+  .sidebar-logo { padding: 20px 18px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 10px; }
+  .sidebar-logo-icon { width: 32px; height: 32px; background: #2D6A4F; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .sidebar-logo-text { font-size: 14px; font-weight: 700; color: #fff; }
+  .sidebar-logo-sub { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 1px; }
+  .sidebar-nav { padding: 12px 10px; flex: 1; }
+  .nav-section { font-size: 10px; color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: .08em; padding: 10px 10px 4px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; font-size: 13px; color: rgba(255,255,255,0.5); cursor: pointer; transition: all 0.15s; margin-bottom: 2px; }
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.8); }
+  .nav-item.active { background: rgba(45,106,79,0.2); color: #34C759; font-weight: 600; }
+  .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+
+  /* ── Main ── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { height: 52px; background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; flex-shrink: 0; }
+  .topbar-title { font-size: 15px; font-weight: 600; color: #fff; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: #2D6A4F; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; }
+  .content { flex: 1; overflow-y: auto; padding: 28px 28px; }
+
+  /* ── Breadcrumb ── */
+  .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(255,255,255,0.35); margin-bottom: 20px; }
+  .breadcrumb span { cursor: pointer; }
+  .breadcrumb span:hover { color: rgba(255,255,255,0.6); }
+  .breadcrumb .sep { color: rgba(255,255,255,0.2); }
+  .breadcrumb .current { color: rgba(255,255,255,0.7); }
+
+  /* ── Page header ── */
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; }
+  .page-title { font-size: 22px; font-weight: 700; color: #fff; }
+  .page-sub { font-size: 13px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+  .btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: all .15s; }
+  .btn-primary { background: #2D6A4F; color: #fff; }
+  .btn-primary:hover { background: #3a8a66; }
+  .btn-outline { background: transparent; color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.12); }
+  .btn-outline:hover { background: rgba(255,255,255,0.05); color: #fff; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+  /* ── Provider grid (vista 1) ── */
+  .providers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .provider-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 22px; cursor: pointer; transition: all .2s; position: relative; overflow: hidden; }
+  .provider-card:hover { background: rgba(45,106,79,0.12); border-color: rgba(45,106,79,0.4); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+  .provider-card.coming-soon { opacity: .45; cursor: default; }
+  .provider-card.coming-soon:hover { transform: none; background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
+  .provider-badge { position: absolute; top: 14px; right: 14px; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; }
+  .badge-active { background: rgba(52,199,89,0.15); color: #34C759; }
+  .badge-soon { background: rgba(255,149,0,0.15); color: #FF9500; }
+  .provider-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 14px; }
+  .provider-name { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .provider-meta { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 14px; }
+  .provider-stats { display: flex; gap: 16px; }
+  .pstat { text-align: center; }
+  .pstat-val { font-size: 18px; font-weight: 700; color: #fff; }
+  .pstat-lbl { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 1px; }
+
+  /* ── Detail view (vista 2) ── */
+  .detail-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+  .detail-icon { width: 52px; height: 52px; border-radius: 14px; background: rgba(45,106,79,0.25); border: 1px solid rgba(45,106,79,0.3); display: flex; align-items: center; justify-content: center; font-size: 26px; }
+  .detail-title { font-size: 22px; font-weight: 700; color: #fff; }
+  .detail-sub { font-size: 13px; color: rgba(255,255,255,0.4); margin-top: 3px; }
+  .detail-actions { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+  .sync-info { font-size: 11px; color: rgba(255,255,255,0.3); text-align: right; }
+
+  /* ── KPIs ── */
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+  .kpi { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px 18px; }
+  .kpi-label { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+  .kpi-value { font-size: 26px; font-weight: 700; color: #fff; }
+  .kpi-sub { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 4px; }
+  .kpi-green .kpi-value { color: #34C759; }
+  .kpi-amber .kpi-value { color: #FF9500; }
+  .kpi-blue .kpi-value  { color: #5AC8FA; }
+
+  /* ── Tabla pedido ── */
+  .section-title { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .section-title .tag { font-size: 10px; background: rgba(45,106,79,0.25); color: #6cdc8f; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+  .table-wrap { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 11px 16px; text-align: left; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); }
+  tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background .12s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.03); }
+  tbody td { padding: 12px 16px; font-size: 13px; color: rgba(255,255,255,0.8); }
+  .td-product { display: flex; flex-direction: column; }
+  .td-product .pname { color: #fff; font-weight: 500; }
+  .td-product .psku  { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 2px; }
+  .td-num { text-align: right; font-variant-numeric: tabular-nums; }
+  .td-demand { font-weight: 700; color: #5AC8FA; text-align: right; }
+  .qty-input { width: 64px; padding: 5px 8px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; color: #fff; font-size: 13px; font-weight: 600; text-align: center; }
+  .qty-input:focus { outline: none; border-color: #2D6A4F; }
+  .pill { display: inline-flex; align-items: center; font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+  .pill-green { background: rgba(52,199,89,0.12); color: #34C759; }
+  .pill-amber { background: rgba(255,149,0,0.12); color: #FF9500; }
+  .pill-red   { background: rgba(255,59,48,0.12);  color: #FF3B30; }
+
+  /* ── Footer bar ── */
+  .order-footer { background: rgba(45,106,79,0.12); border: 1px solid rgba(45,106,79,0.25); border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .order-footer-info { font-size: 13px; color: rgba(255,255,255,0.6); }
+  .order-footer-info strong { color: #fff; }
+  .btn-generate { background: #2D6A4F; color: #fff; padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background .15s; }
+  .btn-generate:hover { background: #3a8a66; }
+
+  /* ── Modelo tag ── */
+  .model-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; background: rgba(90,200,250,0.1); color: #5AC8FA; padding: 3px 9px; border-radius: 20px; margin-left: 8px; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon">🐾</div>
+    <div>
+      <div class="sidebar-logo-text">InfoPet</div>
+      <div class="sidebar-logo-sub">Reñaca · Panel</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <div class="nav-item"><span class="nav-icon">📊</span> Dashboard</div>
+    <div class="nav-item"><span class="nav-icon">📦</span> Inventario</div>
+    <div class="nav-item"><span class="nav-icon">🧾</span> Facturas</div>
+    <div class="nav-section">Comercial</div>
+    <div class="nav-item active"><span class="nav-icon">🛒</span> Pedidos</div>
+    <div class="nav-item"><span class="nav-icon">📈</span> Ventas</div>
+    <div class="nav-item"><span class="nav-icon">🔄</span> Sincronizar</div>
+    <div class="nav-section">Sistema</div>
+    <div class="nav-item"><span class="nav-icon">⚙️</span> Configuración</div>
+  </nav>
+</aside>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <span class="topbar-title" id="topbar-title">Pedidos</span>
+    <div class="topbar-right">
+      <div class="avatar">JV</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- VISTA 1: Lista de proveedores               -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div id="view-providers">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Pedidos</div>
+          <div class="page-sub">Gestión de pedidos por proveedor con análisis de demanda</div>
+        </div>
+      </div>
+
+      <div class="providers-grid">
+
+        <!-- Barf Chile -->
+        <div class="provider-card" onclick="showDetail()">
+          <span class="provider-badge badge-active">Activo</span>
+          <div class="provider-icon" style="background:rgba(52,199,89,0.1)">🥩</div>
+          <div class="provider-name">Barf Chile</div>
+          <div class="provider-meta">Comida húmeda · 8 productos activos</div>
+          <div class="provider-stats">
+            <div class="pstat">
+              <div class="pstat-val">39</div>
+              <div class="pstat-lbl">Ventas 30d</div>
+            </div>
+            <div class="pstat">
+              <div class="pstat-val">12</div>
+              <div class="pstat-lbl">Consumos 30d</div>
+            </div>
+            <div class="pstat">
+              <div class="pstat-val">8</div>
+              <div class="pstat-lbl">Días próx.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Placeholders futuros -->
+        <div class="provider-card coming-soon">
+          <span class="provider-badge badge-soon">Próximamente</span>
+          <div class="provider-icon" style="background:rgba(255,255,255,0.05)">🐟</div>
+          <div class="provider-name">MOR / Bravery</div>
+          <div class="provider-meta">Alimento seco · Próximamente</div>
+        </div>
+
+        <div class="provider-card coming-soon">
+          <span class="provider-badge badge-soon">Próximamente</span>
+          <div class="provider-icon" style="background:rgba(255,255,255,0.05)">🐾</div>
+          <div class="provider-name">Otros proveedores</div>
+          <div class="provider-meta">En configuración</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- VISTA 2: Detalle Barf Chile                 -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div id="view-detail" style="display:none">
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <span onclick="showProviders()">Pedidos</span>
+        <span class="sep">›</span>
+        <span class="current">Barf Chile</span>
+      </div>
+
+      <!-- Header -->
+      <div class="detail-header">
+        <div class="detail-icon">🥩</div>
+        <div>
+          <div class="detail-title">Barf Chile</div>
+          <div class="detail-sub">Comida húmeda · Última sync: hoy 08:45
+            <span class="model-tag">⚡ SES + Frecuencia</span>
+          </div>
+        </div>
+        <div class="detail-actions">
+          <div class="sync-info">Próx. pedido sugerido<br><strong style="color:#FF9500;font-size:13px">en 8 días</strong></div>
+          <button class="btn btn-outline btn-sm" onclick="alert('Sincronizando con Bsale...')">↻ Sync</button>
+          <button class="btn btn-primary btn-sm">+ Nuevo pedido manual</button>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpis">
+        <div class="kpi kpi-blue">
+          <div class="kpi-label">Demanda semanal</div>
+          <div class="kpi-value">11.4</div>
+          <div class="kpi-sub">cajas/semana promedio</div>
+        </div>
+        <div class="kpi kpi-amber">
+          <div class="kpi-label">Consumo interno</div>
+          <div class="kpi-value">3.2</div>
+          <div class="kpi-sub">cajas/semana</div>
+        </div>
+        <div class="kpi kpi-green">
+          <div class="kpi-label">Demanda total</div>
+          <div class="kpi-value">14.6</div>
+          <div class="kpi-sub">cajas/semana (ventas + consumo)</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Días de cobertura</div>
+          <div class="kpi-value">12</div>
+          <div class="kpi-sub">con stock actual</div>
+        </div>
+      </div>
+
+      <!-- Tabla de productos -->
+      <div class="section-title">
+        Recomendación de pedido
+        <span class="tag">Modelo SES · α=0.3</span>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th class="td-num">Ventas 30d</th>
+              <th class="td-num">Consumos 30d</th>
+              <th class="td-num">Demanda SES</th>
+              <th class="td-num">Stock</th>
+              <th class="td-num">Estado</th>
+              <th class="td-num">Pedir (cajas)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="td-product"><span class="pname">Dieta de Vacuno</span><span class="psku">SKU 500 · 4 kg</span></div></td>
+              <td class="td-num">14</td>
+              <td class="td-num">4</td>
+              <td class="td-demand">4.2</td>
+              <td class="td-num">6</td>
+              <td><span class="pill pill-amber">Bajo</span></td>
+              <td class="td-num"><input class="qty-input" type="number" value="8" min="0"></td>
+            </tr>
+            <tr>
+              <td><div class="td-product"><span class="pname">Dieta de Cordero</span><span class="psku">SKU 502 · 4 kg</span></div></td>
+              <td class="td-num">12</td>
+              <td class="td-num">3</td>
+              <td class="td-demand">3.6</td>
+              <td class="td-num">9</td>
+              <td><span class="pill pill-green">Normal</span></td>
+              <td class="td-num"><input class="qty-input" type="number" value="6" min="0"></td>
+            </tr>
+            <tr>
+              <td><div class="td-product"><span class="pname">Dieta de Pollo</span><span class="psku">SKU 499 · 4 kg</span></div></td>
+              <td class="td-num">9</td>
+              <td class="td-num">2</td>
+              <td class="td-demand">2.7</td>
+              <td class="td-num">3</td>
+              <td><span class="pill pill-red">Crítico</span></td>
+              <td class="td-num"><input class="qty-input" type="number" value="10" min="0"></td>
+            </tr>
+            <tr>
+              <td><div class="td-product"><span class="pname">Dieta de Cerdo</span><span class="psku">SKU 503 · 4 kg</span></div></td>
+              <td class="td-num">7</td>
+              <td class="td-num">2</td>
+              <td class="td-demand">2.1</td>
+              <td class="td-num">11</td>
+              <td><span class="pill pill-green">Normal</span></td>
+              <td class="td-num"><input class="qty-input" type="number" value="4" min="0"></td>
+            </tr>
+            <tr>
+              <td><div class="td-product"><span class="pname">Dieta de Salmón</span><span class="psku">SKU 501 · 4 kg</span></div></td>
+              <td class="td-num">6</td>
+              <td class="td-num">1</td>
+              <td class="td-demand">1.7</td>
+              <td class="td-num">5</td>
+              <td><span class="pill pill-amber">Bajo</span></td>
+              <td class="td-num"><input class="qty-input" type="number" value="5" min="0"></td>
+            </tr>
+            <tr>
+              <td><div class="td-product"><span class="pname">Caja Barf 4 KG</span><span class="psku">SKU 1883 · Mixta</span></div></td>
+              <td class="td-num">4</td>
+              <td class="td-num">1</td>
+              <td class="td-demand">1.2</td>
+              <td class="td-num">4</td>
+              <td><span class="pill pill-amber">Bajo</span></td>
+              <td class="td-num"><input class="qty-input" type="number" value="3" min="0"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer del pedido -->
+      <div class="order-footer">
+        <div class="order-footer-info">
+          <strong>36 cajas</strong> en total · Cobertura estimada: <strong>18 días</strong> ·
+          Costo estimado: <strong>$612.000</strong>
+        </div>
+        <button class="btn-generate" onclick="alert('Pedido generado y guardado en Supabase.')">
+          📋 Generar pedido
+        </button>
+      </div>
+
+    </div><!-- /view-detail -->
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+function showDetail() {
+  document.getElementById('view-providers').style.display = 'none';
+  document.getElementById('view-detail').style.display = 'block';
+  document.getElementById('topbar-title').textContent = 'Pedidos · Barf Chile';
+}
+function showProviders() {
+  document.getElementById('view-detail').style.display = 'none';
+  document.getElementById('view-providers').style.display = 'block';
+  document.getElementById('topbar-title').textContent = 'Pedidos';
+}
+</script>
+</body>
+</html>
