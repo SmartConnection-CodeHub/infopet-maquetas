@@ -114,6 +114,24 @@
   /* ── Modelo tag ── */
   .model-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; background: rgba(90,200,250,0.1); color: #5AC8FA; padding: 3px 9px; border-radius: 20px; margin-left: 8px; }
 
+  /* ── Clientes semana + Top 3 ── */
+  .clients-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .clients-panel { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; overflow: hidden; }
+  .clients-panel-header { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; }
+  .clients-panel-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); }
+  .clients-panel-badge { font-size: 10px; background: rgba(90,200,250,0.1); color: #5AC8FA; padding: 2px 8px; border-radius: 20px; }
+  .client-row { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background .12s; }
+  .client-row:last-child { border-bottom: none; }
+  .client-row:hover { background: rgba(255,255,255,0.02); }
+  .client-avatar { width: 30px; height: 30px; border-radius: 50%; background: rgba(45,106,79,0.25); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #6cdc8f; flex-shrink: 0; }
+  .client-name { font-size: 13px; font-weight: 500; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+  .client-meta { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+  .client-right { margin-left: auto; text-align: right; flex-shrink: 0; }
+  .days-urgent { font-size: 12px; font-weight: 700; color: #FF3B30; }
+  .days-soon   { font-size: 12px; font-weight: 700; color: #FF9500; }
+  .days-ok     { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); }
+  .rank-emoji  { font-size: 15px; width: 18px; flex-shrink: 0; }
+
   /* ── Insight clientes nuevos ── */
   .new-clients-card { background: rgba(52,199,89,0.06); border: 1px solid rgba(52,199,89,0.18); border-radius: 12px; padding: 14px 18px; margin-bottom: 18px; display: flex; align-items: flex-start; gap: 16px; }
   .new-clients-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
@@ -305,6 +323,28 @@
         </div>
       </div>
 
+      <!-- Clientes esperados + Top 3 -->
+      <div class="clients-grid">
+
+        <!-- Esperados esta semana -->
+        <div class="clients-panel">
+          <div class="clients-panel-header">
+            <span class="clients-panel-title">Clientes esperados esta semana</span>
+            <span class="clients-panel-badge" id="badge-esperados">4 clientes</span>
+          </div>
+          <div id="clientes-semana"></div>
+        </div>
+
+        <!-- Top 3 compradores -->
+        <div class="clients-panel">
+          <div class="clients-panel-header">
+            <span class="clients-panel-title">Top 3 compradores</span>
+          </div>
+          <div id="top3-clientes"></div>
+        </div>
+
+      </div>
+
       <!-- Tabla de productos -->
       <div class="section-title">
         Pedido martes <span id="title-date"></span>
@@ -363,6 +403,73 @@ const PRODUCTS = [
   { sku:'1883', nombre:'Cocido de Vacuno',   variante:'4 kg', demVenta:0.56, demConsumo:0.00, demNuevos:0.47, debut:false, stock:1, costo:26500 },
   { sku:'1884', nombre:'Cocido de Pollo',    variante:'4 kg', demVenta:0.21, demConsumo:0.00, demNuevos:0.00, debut:false, stock:0, costo:26500 },
 ];
+
+// ── Mapeo SKU → nombre corto ──
+const SKU_NAMES = {
+  '499':'Pollo','500':'Vacuno','501':'Pavo','502':'Cordero',
+  '503':'Salmón','504':'Cerdo','1883':'Coc. Vacuno','1884':'Coc. Pollo',
+  '494':'Hueso S','495':'Hueso XL',
+};
+
+// ── Clientes esperados esta semana (predicción por frecuencia) ──
+const ESPERADOS = [
+  { nombre:'Boris Lopicich',   prox_visita:'2026-05-11', intervalo:29.8, neto_total:156505,  sku_favorito:'500' },
+  { nombre:'Fabiola Lopez',    prox_visita:'2026-05-13', intervalo:23.6, neto_total:210859,  sku_favorito:'500' },
+  { nombre:'Rosario Gonzalez', prox_visita:'2026-05-13', intervalo:85.0, neto_total:7714,    sku_favorito:'495' },
+  { nombre:'Ricardo Mella',    prox_visita:'2026-05-17', intervalo:33.0, neto_total:612613,  sku_favorito:'499' },
+];
+
+// ── Top 3 compradores (excluye "sin cliente") ──
+const TOP3 = [
+  { nombre:'Roxana Werner',  neto_total:832445, visitas:5,  ultima_visita:'2026-04-20', sku_favorito:'499' },
+  { nombre:'Jackeline Nava', neto_total:637184, visitas:28, ultima_visita:'2026-04-15', sku_favorito:'494' },
+  { nombre:'Ricardo Mella',  neto_total:612613, visitas:5,  ultima_visita:'2026-04-14', sku_favorito:'499' },
+];
+
+function initials(nombre) {
+  return nombre.trim().split(/\s+/).slice(0,2).map(w => w[0].toUpperCase()).join('');
+}
+
+function renderClientes() {
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+
+  // Esperados
+  document.getElementById('clientes-semana').innerHTML = ESPERADOS.map(c => {
+    const prox = new Date(c.prox_visita + 'T00:00:00');
+    const dias = Math.round((prox - hoy) / 86400000);
+    const cls  = dias <= 1 ? 'days-urgent' : dias <= 3 ? 'days-soon' : 'days-ok';
+    const txt  = dias === 0 ? '¡Hoy!' : dias === 1 ? 'Mañana' : `En ${dias} días`;
+    const flav = SKU_NAMES[c.sku_favorito] || c.sku_favorito;
+    return `<div class="client-row">
+      <div class="client-avatar">${initials(c.nombre)}</div>
+      <div style="overflow:hidden">
+        <div class="client-name">${c.nombre}</div>
+        <div class="client-meta">${fmtDate(prox)} · c/${c.intervalo.toFixed(0)}d · ♥ ${flav}</div>
+      </div>
+      <div class="client-right">
+        <div class="${cls}">${txt}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:2px">${fmtCLP(c.neto_total)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Top 3
+  document.getElementById('top3-clientes').innerHTML = TOP3.map((c, i) => {
+    const flav = SKU_NAMES[c.sku_favorito] || c.sku_favorito;
+    const medal = ['🥇','🥈','🥉'][i];
+    return `<div class="client-row">
+      <span class="rank-emoji">${medal}</span>
+      <div class="client-avatar">${initials(c.nombre)}</div>
+      <div style="overflow:hidden">
+        <div class="client-name">${c.nombre}</div>
+        <div class="client-meta">${c.visitas} visitas · ♥ ${flav} · últ. ${c.ultima_visita}</div>
+      </div>
+      <div class="client-right">
+        <div style="font-size:13px;font-weight:700;color:#fff">${fmtCLP(c.neto_total)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
 
 // ── Calcular próximo martes ──
 function nextTuesday(from) {
@@ -470,6 +577,7 @@ function showDetail() {
   document.getElementById('topbar-title').textContent = 'Pedidos · Barf Chile';
   initDates();
   renderTable();
+  renderClientes();
 }
 
 function showProviders() {
