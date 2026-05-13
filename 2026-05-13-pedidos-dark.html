@@ -619,7 +619,7 @@
 <div class="page">
 
   <!-- ═══════════ VISTA 1: Proveedores ═══════════ -->
-  <div id="view-providers">
+  <div id="view-providers" style="display:none">
     <div class="page-heading">
       <h1>Pedidos</h1>
       <p>Gestión de pedidos por proveedor con análisis de demanda</p>
@@ -662,7 +662,7 @@
   </div>
 
   <!-- ═══════════ VISTA 2: Barf Chile detalle ═══════════ -->
-  <div id="view-detail" style="display:none">
+  <div id="view-detail">
 
     <div class="breadcrumb">
       <button onclick="showProviders()">Pedidos</button>
@@ -1055,6 +1055,10 @@ function switchTab(tab) {
   document.getElementById('btn-esp').classList.toggle('active',  tab === 'esp')
   document.getElementById('btn-risk').classList.toggle('active', tab === 'risk')
 }
+
+// Iniciar directo en vista detalle
+initDates()
+renderTable()
 
 function toggleDiag() {
   const body = document.getElementById('diag-body')
