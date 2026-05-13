@@ -3,234 +3,1025 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>InfoPet — Pedidos</title>
+<title>InfoPet · Pedidos</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Inter', system-ui, sans-serif; background: #0C1210; color: #f1f5f9; display: flex; min-height: 100vh; }
+  :root {
+    --sand:        #F2E8D5;
+    --sand-dark:   #D9C9A8;
+    --foam:        #FDFAF6;
+    --ocean-deep:  #1A3A4A;
+    --ocean-mid:   #1E5F74;
+    --ocean-light: #2E8EA6;
+    --wave:        #5BB8CC;
+    --horizon:     #A8D8E8;
+    --kelp:        #4A7C59;
+    --kelp-light:  #6AAF7A;
+    --sunset-org:  #E87040;
+    --sunset-pink: #D4506A;
+    --driftwood:   #8B7355;
+    --salt:        #F8F5EF;
+    --ink:         #1A2530;
+    --mist:        #E8F4F8;
+    --sidebar-w:   240px;
+  }
 
-  /* ── Sidebar ── */
-  .sidebar { width: 220px; min-height: 100vh; background: rgba(255,255,255,0.03); border-right: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; flex-shrink: 0; }
-  .sidebar-logo { padding: 20px 18px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 10px; }
-  .sidebar-logo-icon { width: 32px; height: 32px; background: #2D6A4F; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-  .sidebar-logo-text { font-size: 14px; font-weight: 700; color: #fff; }
-  .sidebar-logo-sub { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 1px; }
-  .sidebar-nav { padding: 12px 10px; flex: 1; }
-  .nav-section { font-size: 10px; color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: .08em; padding: 10px 10px 4px; }
-  .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; font-size: 13px; color: rgba(255,255,255,0.5); cursor: pointer; transition: all 0.15s; margin-bottom: 2px; }
-  .nav-item:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.8); }
-  .nav-item.active { background: rgba(45,106,79,0.2); color: #34C759; font-weight: 600; }
-  .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
 
-  /* ── Main ── */
-  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-  .topbar { height: 52px; background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; flex-shrink: 0; }
-  .topbar-title { font-size: 15px; font-weight: 600; color: #fff; }
-  .topbar-right { display: flex; align-items: center; gap: 10px; }
-  .avatar { width: 30px; height: 30px; border-radius: 50%; background: #2D6A4F; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; }
-  .content { flex: 1; overflow-y: auto; padding: 28px 28px; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--salt);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+  }
 
-  /* ── Breadcrumb ── */
-  .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(255,255,255,0.35); margin-bottom: 20px; }
-  .breadcrumb span { cursor: pointer; }
-  .breadcrumb span:hover { color: rgba(255,255,255,0.6); }
-  .breadcrumb .sep { color: rgba(255,255,255,0.2); }
-  .breadcrumb .current { color: rgba(255,255,255,0.7); }
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ════════════ SIDEBAR ════════════ */
+  .sidebar {
+    width: var(--sidebar-w);
+    min-height: 100vh;
+    background: var(--ocean-deep);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left:0; top:0; bottom:0;
+    z-index: 200;
+    overflow-y: auto;
+  }
+
+  .sidebar-top {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .sidebar-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 3px;
+    color: var(--horizon);
+    line-height: 1;
+  }
+
+  .sidebar-logo span { color: var(--wave); }
+
+  .sidebar-tagline {
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: rgba(168,216,232,0.4);
+    margin-top: 4px;
+    font-weight: 300;
+  }
+
+  .nav-group { padding: 20px 12px 4px; }
+
+  .nav-group-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(168,216,232,0.35);
+    padding: 0 8px;
+    margin-bottom: 4px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 2px;
+    position: relative;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+
+  .nav-item.active {
+    background: rgba(91,184,204,0.15);
+    color: var(--horizon);
+    font-weight: 500;
+  }
+
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left:0; top:25%; bottom:25%;
+    width: 3px;
+    background: var(--wave);
+    border-radius: 0 3px 3px 0;
+  }
+
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 16px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .user-card {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .user-card:hover { background: rgba(255,255,255,0.09); }
+
+  .user-avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--ocean-mid), var(--wave));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    flex-shrink: 0;
+    border: 2px solid rgba(168,216,232,0.3);
+  }
+
+  .user-name { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.85); }
+  .user-role { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 1px; }
+
+  /* ════════════ MAIN ════════════ */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(253,250,246,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(139,115,85,0.1);
+    padding: 0 32px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .topbar-left { display: flex; align-items: center; gap: 16px; }
+
+  .page-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--ocean-deep);
+  }
+
+  .page-title em { font-style: italic; color: var(--driftwood); }
+
+  .breadcrumb-top {
+    font-size: 12px;
+    color: var(--driftwood);
+    opacity: 0.6;
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+  .topbar-btn {
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    border: none;
+    transition: all 0.2s;
+  }
+
+  .topbar-btn.primary { background: var(--ocean-deep); color: white; }
+  .topbar-btn.primary:hover { background: var(--ocean-mid); }
+
+  .topbar-btn.outline {
+    background: white;
+    color: var(--ocean-deep);
+    border: 1px solid rgba(139,115,85,0.2);
+  }
+
+  .topbar-btn.outline:hover { border-color: var(--ocean-light); color: var(--ocean-mid); }
+
+  /* ════════════ CONTENT ════════════ */
+  .content { padding: 28px 32px 48px; flex: 1; }
+
+  /* ── Breadcrumb en content ── */
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--driftwood);
+    opacity: 0.7;
+    margin-bottom: 20px;
+    cursor: pointer;
+  }
+
+  .breadcrumb span:hover { opacity: 1; text-decoration: underline; }
+  .breadcrumb .sep { opacity: 0.5; }
+  .breadcrumb .current { color: var(--ocean-deep); font-weight: 500; opacity: 1; }
 
   /* ── Page header ── */
   .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; }
-  .page-title { font-size: 22px; font-weight: 700; color: #fff; }
-  .page-sub { font-size: 13px; color: rgba(255,255,255,0.4); margin-top: 4px; }
-  .btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: all .15s; }
-  .btn-primary { background: #2D6A4F; color: #fff; }
-  .btn-primary:hover { background: #3a8a66; }
-  .btn-outline { background: transparent; color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.12); }
-  .btn-outline:hover { background: rgba(255,255,255,0.05); color: #fff; }
-  .btn-sm { padding: 6px 12px; font-size: 12px; }
+  .page-title-lg {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: var(--ocean-deep);
+    line-height: 1.1;
+  }
+  .page-title-lg em { font-style: italic; color: var(--driftwood); }
+  .page-sub { font-size: 13px; color: var(--driftwood); margin-top: 5px; font-weight: 300; }
 
-  /* ── Provider grid (vista 1) ── */
+  /* ── Botones ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all .2s;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-primary { background: var(--ocean-deep); color: white; }
+  .btn-primary:hover { background: var(--ocean-mid); }
+
+  .btn-outline {
+    background: white;
+    color: var(--ocean-deep);
+    border: 1px solid rgba(139,115,85,0.2);
+  }
+
+  .btn-outline:hover { border-color: var(--ocean-light); color: var(--ocean-mid); }
+  .btn-sm { padding: 6px 14px; font-size: 12px; }
+
+  /* ── Panel base ── */
+  .panel {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid rgba(139,115,85,0.08);
+    overflow: hidden;
+  }
+
+  .panel-head {
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(139,115,85,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .panel-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px;
+    color: var(--ocean-deep);
+  }
+
+  .panel-title em { font-style: italic; color: var(--driftwood); }
+  .panel-sub { font-size: 11px; color: var(--driftwood); margin-top: 2px; }
+
+  .panel-action {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ocean-light);
+    background: none;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .panel-action:hover { opacity: 0.6; }
+
+  /* ── Provider grid ── */
   .providers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-  .provider-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 22px; cursor: pointer; transition: all .2s; position: relative; overflow: hidden; }
-  .provider-card:hover { background: rgba(45,106,79,0.12); border-color: rgba(45,106,79,0.4); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
-  .provider-card.coming-soon { opacity: .45; cursor: default; }
-  .provider-card.coming-soon:hover { transform: none; background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
-  .provider-badge { position: absolute; top: 14px; right: 14px; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; }
-  .badge-active { background: rgba(52,199,89,0.15); color: #34C759; }
-  .badge-soon { background: rgba(255,149,0,0.15); color: #FF9500; }
-  .provider-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 14px; }
-  .provider-name { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-  .provider-meta { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 14px; }
-  .provider-stats { display: flex; gap: 16px; }
-  .pstat { text-align: center; }
-  .pstat-val { font-size: 18px; font-weight: 700; color: #fff; }
-  .pstat-lbl { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 1px; }
 
-  /* ── Detail view (vista 2) ── */
-  .detail-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
-  .detail-icon { width: 52px; height: 52px; border-radius: 14px; background: rgba(45,106,79,0.25); border: 1px solid rgba(45,106,79,0.3); display: flex; align-items: center; justify-content: center; font-size: 26px; }
-  .detail-title { font-size: 22px; font-weight: 700; color: #fff; }
-  .detail-sub { font-size: 13px; color: rgba(255,255,255,0.4); margin-top: 3px; }
+  .provider-card {
+    background: white;
+    border: 1px solid rgba(139,115,85,0.1);
+    border-radius: 16px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all .2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .provider-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--ocean-mid), var(--wave));
+    border-radius: 16px 16px 0 0;
+  }
+
+  .provider-card:hover {
+    border-color: rgba(30,95,116,0.25);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(26,58,74,0.08);
+  }
+
+  .provider-card.coming-soon { opacity: .55; cursor: default; }
+  .provider-card.coming-soon:hover { transform: none; box-shadow: none; }
+  .provider-card.coming-soon::after { background: linear-gradient(90deg, var(--driftwood), var(--sand-dark)); }
+
+  .provider-badge {
+    position: absolute;
+    top: 16px; right: 16px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-active { background: rgba(74,124,89,0.1); color: var(--kelp); border: 1px solid rgba(74,124,89,0.2); }
+  .badge-soon { background: rgba(232,112,64,0.1); color: var(--sunset-org); border: 1px solid rgba(232,112,64,0.2); }
+
+  .provider-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 14px;
+    background: var(--mist);
+  }
+
+  .provider-name { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--ocean-deep); margin-bottom: 4px; }
+  .provider-meta { font-size: 12px; color: var(--driftwood); margin-bottom: 16px; font-weight: 300; }
+
+  .provider-stats { display: flex; gap: 20px; }
+  .pstat {}
+  .pstat-val { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--ocean-deep); letter-spacing: 1px; line-height: 1; }
+  .pstat-lbl { font-size: 10px; color: var(--driftwood); margin-top: 2px; letter-spacing: 0.5px; }
+
+  /* ── Detail header ── */
+  .detail-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    background: white;
+    border: 1px solid rgba(139,115,85,0.08);
+    border-radius: 16px;
+    padding: 20px 24px;
+  }
+
+  .detail-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    background: var(--mist);
+    border: 1px solid rgba(91,184,204,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+
+  .detail-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--ocean-deep); }
+  .detail-sub { font-size: 13px; color: var(--driftwood); margin-top: 3px; font-weight: 300; }
   .detail-actions { margin-left: auto; display: flex; gap: 10px; align-items: center; }
-  .sync-info { font-size: 11px; color: rgba(255,255,255,0.3); text-align: right; }
+  .sync-info { font-size: 11px; color: var(--driftwood); text-align: right; line-height: 1.5; }
+
+  /* ── Model tag ── */
+  .model-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    background: rgba(91,184,204,0.1);
+    color: var(--ocean-mid);
+    border: 1px solid rgba(91,184,204,0.25);
+    padding: 3px 9px;
+    border-radius: 20px;
+    margin-left: 8px;
+    font-weight: 500;
+  }
 
   /* ── KPIs ── */
   .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
-  .kpi { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px 18px; }
-  .kpi-label { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
-  .kpi-value { font-size: 26px; font-weight: 700; color: #fff; }
-  .kpi-sub { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 4px; }
-  .kpi-green .kpi-value { color: #34C759; }
-  .kpi-amber .kpi-value { color: #FF9500; }
-  .kpi-blue .kpi-value  { color: #5AC8FA; }
 
-  /* ── Tabla pedido ── */
-  .section-title { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-  .section-title .tag { font-size: 10px; background: rgba(45,106,79,0.25); color: #6cdc8f; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
-  .table-wrap { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
-  table { width: 100%; border-collapse: collapse; }
-  thead th { padding: 11px 16px; text-align: left; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); }
-  tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background .12s; }
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: rgba(255,255,255,0.03); }
-  tbody td { padding: 12px 16px; font-size: 13px; color: rgba(255,255,255,0.8); }
-  .td-product { display: flex; flex-direction: column; }
-  .td-product .pname { color: #fff; font-weight: 500; }
-  .td-product .psku  { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 2px; }
-  .td-num { text-align: right; font-variant-numeric: tabular-nums; }
-  .td-demand { font-weight: 700; color: #5AC8FA; text-align: right; }
-  .qty-input { width: 64px; padding: 5px 8px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; color: #fff; font-size: 13px; font-weight: 600; text-align: center; }
-  .qty-input:focus { outline: none; border-color: #2D6A4F; }
-  .pill { display: inline-flex; align-items: center; font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
-  .pill-green { background: rgba(52,199,89,0.12); color: #34C759; }
-  .pill-amber { background: rgba(255,149,0,0.12); color: #FF9500; }
-  .pill-red   { background: rgba(255,59,48,0.12);  color: #FF3B30; }
+  .kpi {
+    background: white;
+    border: 1px solid rgba(139,115,85,0.08);
+    border-radius: 14px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
 
-  /* ── Footer bar ── */
-  .order-footer { background: rgba(45,106,79,0.12); border: 1px solid rgba(45,106,79,0.25); border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
-  .order-footer-info { font-size: 13px; color: rgba(255,255,255,0.6); }
-  .order-footer-info strong { color: #fff; }
-  .btn-generate { background: #2D6A4F; color: #fff; padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background .15s; }
-  .btn-generate:hover { background: #3a8a66; }
+  .kpi:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,58,74,0.06); }
 
-  /* ── Modelo tag ── */
-  .model-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; background: rgba(90,200,250,0.1); color: #5AC8FA; padding: 3px 9px; border-radius: 20px; margin-left: 8px; }
+  .kpi::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 14px 14px 0 0;
+  }
 
-  /* ── Clientes semana + Top 3 ── */
-  .clients-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
-  .clients-panel { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; overflow: hidden; }
-  .clients-panel-header { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; }
-  .clients-panel-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); }
-  .clients-panel-badge { font-size: 10px; background: rgba(90,200,250,0.1); color: #5AC8FA; padding: 2px 8px; border-radius: 20px; }
-  .client-row { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background .12s; }
-  .client-row:last-child { border-bottom: none; }
-  .client-row:hover { background: rgba(255,255,255,0.02); }
-  .client-avatar { width: 30px; height: 30px; border-radius: 50%; background: rgba(45,106,79,0.25); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #6cdc8f; flex-shrink: 0; }
-  .client-name { font-size: 13px; font-weight: 500; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
-  .client-meta { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 2px; }
-  .client-right { margin-left: auto; text-align: right; flex-shrink: 0; }
-  .days-urgent { font-size: 12px; font-weight: 700; color: #FF3B30; }
-  .days-soon   { font-size: 12px; font-weight: 700; color: #FF9500; }
-  .days-ok     { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); }
-  .rank-emoji  { font-size: 15px; width: 18px; flex-shrink: 0; }
+  .kpi-ocean::after { background: linear-gradient(90deg, var(--ocean-mid), var(--wave)); }
+  .kpi-sand::after  { background: linear-gradient(90deg, var(--driftwood), var(--sand-dark)); }
+  .kpi-kelp::after  { background: linear-gradient(90deg, var(--kelp), var(--kelp-light)); }
+  .kpi-sunset::after{ background: linear-gradient(90deg, var(--sunset-org), var(--sunset-pink)); }
 
-  /* ── Insight clientes nuevos ── */
-  .new-clients-card { background: rgba(52,199,89,0.06); border: 1px solid rgba(52,199,89,0.18); border-radius: 12px; padding: 14px 18px; margin-bottom: 18px; display: flex; align-items: flex-start; gap: 16px; }
+  .kpi-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--driftwood);
+    margin-bottom: 10px;
+  }
+
+  .kpi-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 1px;
+    color: var(--ocean-deep);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .kpi-ocean .kpi-value { color: var(--ocean-mid); }
+  .kpi-kelp .kpi-value  { color: var(--kelp); }
+  .kpi-sunset .kpi-value{ color: var(--sunset-org); }
+
+  .kpi-sub { font-size: 11px; color: var(--driftwood); font-weight: 300; }
+
+  /* ── Status pills ── */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+
+  .pill-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+  .pill-green  { background: rgba(74,124,89,0.1);   color: var(--kelp);        border: 1px solid rgba(74,124,89,0.2); }
+  .pill-amber  { background: rgba(232,112,64,0.1);  color: var(--sunset-org);  border: 1px solid rgba(232,112,64,0.2); }
+  .pill-red    { background: rgba(212,80,106,0.1);  color: var(--sunset-pink); border: 1px solid rgba(212,80,106,0.2); }
+
+  /* ── Alerta entrega ── */
+  .delivery-alert {
+    background: rgba(232,112,64,0.06);
+    border: 1px solid rgba(232,112,64,0.2);
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--ink);
+  }
+
+  .delivery-badge {
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(232,112,64,0.12);
+    color: var(--sunset-org);
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(232,112,64,0.2);
+  }
+
+  /* ── Clientes nuevos card ── */
+  .new-clients-card {
+    background: rgba(74,124,89,0.05);
+    border: 1px solid rgba(74,124,89,0.2);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
   .new-clients-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
   .new-clients-body { flex: 1; }
-  .new-clients-title { font-size: 13px; font-weight: 600; color: #34C759; margin-bottom: 6px; }
-  .new-clients-flavors { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
-  .flavor-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; background: rgba(52,199,89,0.1); border: 1px solid rgba(52,199,89,0.2); color: rgba(255,255,255,0.8); padding: 3px 10px; border-radius: 20px; }
-  .flavor-chip .fc-count { font-weight: 700; color: #34C759; }
-  .flavor-chip.debut-star { border-color: rgba(52,199,89,0.5); background: rgba(52,199,89,0.18); }
-  .new-clients-note { font-size: 11px; color: rgba(255,255,255,0.35); }
-  .new-clients-stat { text-align: center; padding-left: 16px; border-left: 1px solid rgba(52,199,89,0.15); flex-shrink: 0; }
-  .new-clients-stat .ns-val { font-size: 26px; font-weight: 700; color: #34C759; }
-  .new-clients-stat .ns-lbl { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 2px; }
 
-  /* ── Badge debut en tabla ── */
-  .debut-badge { display: inline-flex; align-items: center; font-size: 9px; background: rgba(52,199,89,0.12); color: #34C759; padding: 1px 6px; border-radius: 20px; margin-left: 5px; font-weight: 600; letter-spacing: .02em; }
-  .td-new { text-align: right; font-size: 11px; color: rgba(52,199,89,0.7); font-variant-numeric: tabular-nums; }
-  .model-badge { display: inline-flex; font-size: 9px; padding: 1px 5px; border-radius: 4px; font-weight: 600; margin-left: 4px; vertical-align: middle; }
-  .model-ses  { background: rgba(90,200,250,0.15); color: #5AC8FA; }
-  .model-avg  { background: rgba(255,149,0,0.15);  color: #FF9500; }
+  .new-clients-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--kelp);
+    margin-bottom: 8px;
+  }
+
+  .new-clients-flavors { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+
+  .flavor-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    background: rgba(74,124,89,0.08);
+    border: 1px solid rgba(74,124,89,0.18);
+    color: var(--ink);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 400;
+  }
+
+  .flavor-chip .fc-count { font-weight: 700; color: var(--kelp); }
+
+  .flavor-chip.debut-star {
+    border-color: rgba(74,124,89,0.4);
+    background: rgba(74,124,89,0.14);
+  }
+
+  .new-clients-note { font-size: 11px; color: var(--driftwood); font-weight: 300; }
+
+  .new-clients-stat {
+    text-align: center;
+    padding-left: 20px;
+    border-left: 1px solid rgba(74,124,89,0.2);
+    flex-shrink: 0;
+  }
+
+  .new-clients-stat .ns-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--kelp);
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+
+  .new-clients-stat .ns-lbl { font-size: 10px; color: var(--driftwood); margin-top: 4px; }
+
+  /* ── Clientes grid ── */
+  .clients-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+
+  .clients-panel {
+    background: white;
+    border: 1px solid rgba(139,115,85,0.08);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .clients-panel-header {
+    padding: 13px 18px;
+    border-bottom: 1px solid rgba(139,115,85,0.07);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--salt);
+  }
+
+  .clients-panel-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 14px;
+    color: var(--ocean-deep);
+  }
 
   /* ── Tabs clientes ── */
   .tab-bar { display: flex; gap: 4px; }
-  .tab-btn { font-size: 11px; padding: 3px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: rgba(255,255,255,0.4); cursor: pointer; transition: all .15s; }
-  .tab-btn.active { background: rgba(45,106,79,0.25); border-color: rgba(45,106,79,0.4); color: #6cdc8f; }
-  .client-row.skipped { opacity: .6; }
-  .skipped-label { font-size: 10px; color: #FF9500; margin-top: 2px; }
 
-  /* ── Panel diagnóstico modelo ── */
-  .diagnostico { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; margin-top: 20px; overflow: hidden; }
-  .diagnostico-header { padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
-  .diagnostico-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 8px; }
-  .diagnostico-body { padding: 0 16px 16px; display: none; }
-  .diagnostico-body.open { display: block; }
-  .mape-bar-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-  .mape-label { font-size: 11px; color: rgba(255,255,255,0.5); width: 60px; text-align: right; }
-  .mape-bar-bg { flex: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+  .tab-btn {
+    font-size: 11px;
+    padding: 4px 11px;
+    border-radius: 20px;
+    border: 1px solid rgba(139,115,85,0.2);
+    background: white;
+    color: var(--driftwood);
+    cursor: pointer;
+    transition: all .15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .tab-btn.active {
+    background: var(--ocean-deep);
+    border-color: var(--ocean-deep);
+    color: white;
+  }
+
+  .tab-btn.warn-tab {
+    border-color: rgba(232,112,64,0.3);
+    color: var(--sunset-org);
+  }
+
+  /* ── Client row ── */
+  .client-row {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 12px 18px;
+    border-bottom: 1px solid rgba(139,115,85,0.06);
+    transition: background .12s;
+    cursor: default;
+  }
+
+  .client-row:last-child { border-bottom: none; }
+  .client-row:hover { background: rgba(168,216,232,0.06); }
+  .client-row.skipped { opacity: .75; }
+
+  .client-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--mist);
+    border: 1px solid rgba(91,184,204,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--ocean-mid);
+    flex-shrink: 0;
+  }
+
+  .client-avatar.warn {
+    background: rgba(232,112,64,0.08);
+    border-color: rgba(232,112,64,0.25);
+    color: var(--sunset-org);
+  }
+
+  .client-name { font-size: 13px; font-weight: 500; color: var(--ocean-deep); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
+  .client-meta { font-size: 10px; color: var(--driftwood); margin-top: 2px; font-weight: 300; }
+  .client-right { margin-left: auto; text-align: right; flex-shrink: 0; }
+  .skipped-label { font-size: 10px; color: var(--sunset-org); margin-top: 2px; }
+
+  .days-urgent { font-size: 12px; font-weight: 700; color: var(--sunset-pink); }
+  .days-soon   { font-size: 12px; font-weight: 700; color: var(--sunset-org); }
+  .days-ok     { font-size: 12px; font-weight: 500; color: var(--driftwood); }
+  .rank-emoji  { font-size: 16px; width: 20px; flex-shrink: 0; }
+
+  /* ── Sección título ── */
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--ocean-deep);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-tag {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    background: rgba(30,95,116,0.1);
+    color: var(--ocean-mid);
+    border: 1px solid rgba(30,95,116,0.2);
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  /* ── Tabla pedido ── */
+  .table-wrap {
+    background: white;
+    border: 1px solid rgba(139,115,85,0.08);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead th {
+    padding: 11px 18px;
+    text-align: left;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--driftwood);
+    background: var(--salt);
+    border-bottom: 1px solid rgba(139,115,85,0.08);
+  }
+
+  tbody td {
+    padding: 13px 18px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(139,115,85,0.05);
+    color: var(--ink);
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr { transition: background .15s; }
+  tbody tr:hover td { background: rgba(168,216,232,0.06); }
+
+  .td-product { display: flex; flex-direction: column; }
+  .td-product .pname { color: var(--ocean-deep); font-weight: 500; }
+  .td-product .psku  { font-size: 11px; color: var(--driftwood); margin-top: 2px; font-weight: 300; }
+
+  .td-num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  .td-demand {
+    text-align: right;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 0.5px;
+    color: var(--ocean-mid);
+  }
+
+  .qty-input {
+    width: 64px;
+    padding: 6px 8px;
+    background: var(--salt);
+    border: 1px solid rgba(139,115,85,0.2);
+    border-radius: 8px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 1px;
+  }
+
+  .qty-input:focus { outline: none; border-color: var(--ocean-light); background: white; }
+
+  .debut-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 9px;
+    background: rgba(74,124,89,0.1);
+    color: var(--kelp);
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 5px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .td-new { text-align: right; font-size: 11px; color: var(--kelp-light); font-variant-numeric: tabular-nums; }
+
+  .model-badge {
+    display: inline-flex;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+    margin-left: 4px;
+    vertical-align: middle;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .model-ses  { background: rgba(30,95,116,0.1);  color: var(--ocean-mid); }
+  .model-avg  { background: rgba(232,112,64,0.1); color: var(--sunset-org); }
+
+  /* ── Footer pedido ── */
+  .order-footer {
+    background: white;
+    border: 1px solid rgba(139,115,85,0.1);
+    border-radius: 14px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .order-footer-info { flex: 1; }
+
+  .footer-totals { display: flex; gap: 32px; margin-top: 12px; align-items: flex-end; }
+
+  .footer-total-item {}
+  .footer-total-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--driftwood);
+    margin-bottom: 4px;
+  }
+
+  .footer-total-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 1px;
+    color: var(--ocean-deep);
+    line-height: 1;
+  }
+
+  .footer-total-val.accent { color: var(--sunset-org); font-size: 30px; }
+
+  .footer-note {
+    font-size: 11px;
+    color: var(--driftwood);
+    margin-top: 10px;
+    font-weight: 300;
+  }
+
+  .btn-generate {
+    background: var(--ocean-deep);
+    color: white;
+    padding: 12px 28px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background .2s;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+  }
+
+  .btn-generate:hover { background: var(--ocean-mid); }
+
+  /* ── Diagnóstico modelo ── */
+  .diagnostico {
+    background: white;
+    border: 1px solid rgba(139,115,85,0.08);
+    border-radius: 14px;
+    margin-top: 20px;
+    overflow: hidden;
+  }
+
+  .diagnostico-header {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    background: var(--salt);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+
+  .diagnostico-header:hover { background: rgba(168,216,232,0.08); }
+
+  .diagnostico-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ocean-deep);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .diagnostico-arrow {
+    font-size: 11px;
+    color: var(--driftwood);
+    letter-spacing: 0.5px;
+  }
+
+  .diagnostico-body { padding: 0 20px 20px; display: none; }
+  .diagnostico-body.open { display: block; padding-top: 16px; }
+
+  .mape-bar-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .mape-label { font-size: 11px; color: var(--driftwood); width: 64px; text-align: right; font-weight: 300; }
+  .mape-bar-bg { flex: 1; height: 6px; background: var(--sand); border-radius: 3px; overflow: hidden; }
   .mape-bar-fill { height: 100%; border-radius: 3px; }
-  .mape-val { font-size: 11px; font-weight: 600; width: 40px; }
-  .prec-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 12px; }
-  .prec-table th { padding: 6px 8px; text-align: left; color: rgba(255,255,255,0.3); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid rgba(255,255,255,0.06); }
-  .prec-table td { padding: 7px 8px; border-bottom: 1px solid rgba(255,255,255,0.04); color: rgba(255,255,255,0.75); }
+  .mape-val { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 0.5px; width: 48px; }
+
+  .prec-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 14px; }
+
+  .prec-table th {
+    padding: 7px 10px;
+    text-align: left;
+    color: var(--driftwood);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(139,115,85,0.08);
+    background: var(--salt);
+  }
+
+  .prec-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(139,115,85,0.05);
+    color: var(--ink);
+    font-size: 12px;
+  }
+
   .prec-table tr:last-child td { border-bottom: none; }
-  .mejor-badge { font-size: 10px; padding: 1px 6px; border-radius: 4px; font-weight: 600; }
+  .prec-table tr:hover td { background: rgba(168,216,232,0.05); }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .mejor-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+  }
 </style>
 </head>
 <body>
 
-<!-- Sidebar -->
+<!-- SIDEBAR -->
 <aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="sidebar-logo-icon">🐾</div>
-    <div>
-      <div class="sidebar-logo-text">InfoPet</div>
-      <div class="sidebar-logo-sub">Reñaca · Panel</div>
+  <div class="sidebar-top">
+    <div class="sidebar-logo">Info<span>Pet</span></div>
+    <div class="sidebar-tagline">· Panel de control</div>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Principal</div>
+    <div class="nav-item"><span class="nav-icon">🌊</span><span>Dashboard</span></div>
+    <div class="nav-item"><span class="nav-icon">📦</span><span>Inventario</span></div>
+    <div class="nav-item"><span class="nav-icon">🧾</span><span>Facturas</span></div>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Comercial</div>
+    <div class="nav-item active"><span class="nav-icon">🛒</span><span>Pedidos</span></div>
+    <div class="nav-item"><span class="nav-icon">📈</span><span>Ventas</span></div>
+    <div class="nav-item"><span class="nav-icon">🔄</span><span>Sincronizar</span></div>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Sistema</div>
+    <div class="nav-item"><span class="nav-icon">⚙️</span><span>Configuración</span></div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">JV</div>
+      <div>
+        <div class="user-name">Javier</div>
+        <div class="user-role">Admin · acceso total</div>
+      </div>
     </div>
   </div>
-  <nav class="sidebar-nav">
-    <div class="nav-section">Principal</div>
-    <div class="nav-item"><span class="nav-icon">📊</span> Dashboard</div>
-    <div class="nav-item"><span class="nav-icon">📦</span> Inventario</div>
-    <div class="nav-item"><span class="nav-icon">🧾</span> Facturas</div>
-    <div class="nav-section">Comercial</div>
-    <div class="nav-item active"><span class="nav-icon">🛒</span> Pedidos</div>
-    <div class="nav-item"><span class="nav-icon">📈</span> Ventas</div>
-    <div class="nav-item"><span class="nav-icon">🔄</span> Sincronizar</div>
-    <div class="nav-section">Sistema</div>
-    <div class="nav-item"><span class="nav-icon">⚙️</span> Configuración</div>
-  </nav>
 </aside>
 
-<!-- Main -->
+<!-- MAIN -->
 <div class="main">
+
+  <!-- TOPBAR -->
   <div class="topbar">
-    <span class="topbar-title" id="topbar-title">Pedidos</span>
+    <div class="topbar-left">
+      <div>
+        <div class="page-title" id="topbar-title">Pedidos</div>
+      </div>
+    </div>
     <div class="topbar-right">
-      <div class="avatar">JV</div>
+      <button class="topbar-btn outline" onclick="alert('Sincronizando con Bsale...')">↻ Sync Bsale</button>
+      <button class="topbar-btn primary" id="topbar-action" onclick="showDetail()">Abrir Barf Chile →</button>
     </div>
   </div>
 
+  <!-- CONTENT -->
   <div class="content">
 
-    <!-- ═══════════════════════════════════════════ -->
-    <!-- VISTA 1: Lista de proveedores               -->
-    <!-- ═══════════════════════════════════════════ -->
+    <!-- ═══════════ VISTA 1: Proveedores ═══════════ -->
     <div id="view-providers">
       <div class="page-header">
         <div>
-          <div class="page-title">Pedidos</div>
+          <div class="page-title-lg">Pedidos <em>· Proveedores</em></div>
           <div class="page-sub">Gestión de pedidos por proveedor con análisis de demanda</div>
         </div>
       </div>
 
       <div class="providers-grid">
 
-        <!-- Barf Chile -->
         <div class="provider-card" onclick="showDetail()">
           <span class="provider-badge badge-active">Activo</span>
-          <div class="provider-icon" style="background:rgba(52,199,89,0.1)">🥩</div>
+          <div class="provider-icon">🥩</div>
           <div class="provider-name">Barf Chile</div>
           <div class="provider-meta">Comida húmeda · 10 productos activos</div>
           <div class="provider-stats">
@@ -249,17 +1040,16 @@
           </div>
         </div>
 
-        <!-- Placeholders futuros -->
         <div class="provider-card coming-soon">
           <span class="provider-badge badge-soon">Próximamente</span>
-          <div class="provider-icon" style="background:rgba(255,255,255,0.05)">🐟</div>
+          <div class="provider-icon">🐟</div>
           <div class="provider-name">MOR / Bravery</div>
-          <div class="provider-meta">Alimento seco · Próximamente</div>
+          <div class="provider-meta">Alimento seco · En configuración</div>
         </div>
 
         <div class="provider-card coming-soon">
           <span class="provider-badge badge-soon">Próximamente</span>
-          <div class="provider-icon" style="background:rgba(255,255,255,0.05)">🐾</div>
+          <div class="provider-icon">🐾</div>
           <div class="provider-name">Otros proveedores</div>
           <div class="provider-meta">En configuración</div>
         </div>
@@ -267,12 +1057,9 @@
       </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════ -->
-    <!-- VISTA 2: Detalle Barf Chile                 -->
-    <!-- ═══════════════════════════════════════════ -->
+    <!-- ═══════════ VISTA 2: Barf Chile ═══════════ -->
     <div id="view-detail" style="display:none">
 
-      <!-- Breadcrumb -->
       <div class="breadcrumb">
         <span onclick="showProviders()">Pedidos</span>
         <span class="sep">›</span>
@@ -284,14 +1071,15 @@
         <div class="detail-icon">🥩</div>
         <div>
           <div class="detail-title">Barf Chile</div>
-          <div class="detail-sub">Comida húmeda · 10 productos · Stock sincronizado: hoy 10 may 2026
+          <div class="detail-sub">
+            Comida húmeda · 10 productos · Stock sincronizado: hoy 11 may 2026
             <span class="model-tag">⚡ SES + Frecuencia</span>
           </div>
         </div>
         <div class="detail-actions">
-          <div class="sync-info">Próx. pedido sugerido<br><strong style="color:#FF9500;font-size:13px">en 8 días</strong></div>
+          <div class="sync-info">Próx. pedido sugerido<br><strong style="color:var(--sunset-org);font-size:14px">en 8 días</strong></div>
           <button class="btn btn-outline btn-sm" onclick="alert('Sincronizando con Bsale...')">↻ Sync</button>
-          <button class="btn btn-primary btn-sm">+ Nuevo pedido manual</button>
+          <button class="btn btn-primary btn-sm">+ Pedido manual</button>
         </div>
       </div>
 
@@ -317,69 +1105,67 @@
         </div>
       </div>
 
-      <!-- Alerta de entrega -->
-      <div id="delivery-alert" style="background:rgba(255,149,0,0.08);border:1px solid rgba(255,149,0,0.25);border-radius:10px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
-        <div style="display:flex;align-items:center;gap:10px;font-size:13px">
-          <span style="font-size:18px">🚚</span>
-          <span>Próxima entrega: <strong style="color:#FF9500" id="next-tuesday"></strong> &nbsp;·&nbsp; Período cubierto: <strong id="cover-period" style="color:rgba(255,255,255,0.8)"></strong></span>
+      <!-- Alerta entrega -->
+      <div class="delivery-alert">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:20px">🚚</span>
+          <span>Próxima entrega: <strong style="color:var(--sunset-org)" id="next-tuesday"></strong> &nbsp;·&nbsp; Período cubierto: <strong id="cover-period" style="color:var(--ocean-deep)"></strong></span>
         </div>
-        <span id="days-counter" style="font-size:12px;background:rgba(255,149,0,0.15);color:#FF9500;padding:4px 10px;border-radius:20px;font-weight:600"></span>
+        <span class="delivery-badge" id="days-counter"></span>
       </div>
 
       <!-- KPIs -->
       <div class="kpis">
-        <div class="kpi kpi-blue">
+        <div class="kpi kpi-ocean">
           <div class="kpi-label">Demanda venta / semana</div>
           <div class="kpi-value" id="kpi-ventas">11.4</div>
           <div class="kpi-sub">cajas · modelo SES</div>
         </div>
-        <div class="kpi kpi-amber">
+        <div class="kpi kpi-sand">
           <div class="kpi-label">Consumo interno / semana</div>
           <div class="kpi-value" id="kpi-consumo">3.2</div>
           <div class="kpi-sub">cajas · promedio 4 semanas</div>
         </div>
-        <div class="kpi kpi-green">
+        <div class="kpi kpi-kelp">
           <div class="kpi-label">Demanda total semana</div>
           <div class="kpi-value" id="kpi-total">14.6</div>
           <div class="kpi-sub">ventas + consumo interno</div>
         </div>
-        <div class="kpi">
+        <div class="kpi kpi-sunset">
           <div class="kpi-label">A pedir esta semana</div>
-          <div class="kpi-value" id="kpi-pedir" style="color:#FF9500">—</div>
-          <div class="kpi-sub">cajas · flujo de caja optimizado</div>
+          <div class="kpi-value" id="kpi-pedir">—</div>
+          <div class="kpi-sub">cajas · flujo optimizado</div>
         </div>
       </div>
 
-      <!-- Clientes esperados + Top 3 -->
+      <!-- Clientes semana + Top 3 -->
       <div class="clients-grid">
 
-        <!-- Esperados / Saltados esta semana -->
         <div class="clients-panel">
           <div class="clients-panel-header">
             <span class="clients-panel-title">Clientes esta semana</span>
             <div class="tab-bar">
               <button class="tab-btn active" id="tab-esp-btn" onclick="switchClientTab('esperados')">Esperados (4)</button>
-              <button class="tab-btn" id="tab-salt-btn" onclick="switchClientTab('saltados')" style="border-color:rgba(255,149,0,0.3);color:rgba(255,149,0,0.7)">En riesgo (25)</button>
+              <button class="tab-btn warn-tab" id="tab-salt-btn" onclick="switchClientTab('saltados')">En riesgo (6)</button>
             </div>
           </div>
           <div id="tab-esp"><div id="clientes-semana"></div></div>
           <div id="tab-salt" style="display:none"><div id="clientes-saltados"></div></div>
         </div>
 
-        <!-- Top 3 compradores -->
         <div class="clients-panel">
           <div class="clients-panel-header">
-            <span class="clients-panel-title">Top 3 compradores</span>
+            <span class="clients-panel-title">Top 3 <em>compradores</em></span>
           </div>
           <div id="top3-clientes"></div>
         </div>
 
       </div>
 
-      <!-- Tabla de productos -->
+      <!-- Tabla productos -->
       <div class="section-title">
         Pedido martes <span id="title-date"></span>
-        <span class="tag">SES/Prom híbrido · 7 días · +1 seg. debut</span>
+        <span class="section-tag">SES/Prom híbrido · 7 días · +1 seg. debut</span>
       </div>
 
       <div class="table-wrap">
@@ -387,70 +1173,80 @@
           <thead>
             <tr>
               <th>Producto</th>
-              <th class="td-num">Dem. semana</th>
-              <th class="td-num">Consumo sem.</th>
-              <th class="td-num">Total sem.</th>
-              <th class="td-num" title="Demanda atribuida a clientes nuevos (últimos 90 días) — ya incluida en Dem. semana">Nuevos/sem ℹ</th>
-              <th class="td-num">Stock actual</th>
-              <th class="td-num">Estado</th>
-              <th class="td-num">Pedir</th>
+              <th style="text-align:right">Dem. semana</th>
+              <th style="text-align:right">Consumo sem.</th>
+              <th style="text-align:right">Total sem.</th>
+              <th style="text-align:right" title="Demanda de clientes nuevos (últimos 90 días)">Nuevos/sem ℹ</th>
+              <th style="text-align:right">Stock actual</th>
+              <th>Estado</th>
+              <th style="text-align:right">Pedir</th>
             </tr>
           </thead>
           <tbody id="products-tbody"></tbody>
         </table>
       </div>
 
-      <!-- Footer del pedido -->
+      <!-- Footer pedido -->
       <div class="order-footer">
         <div class="order-footer-info">
-          <strong id="footer-cajas">—</strong> cajas en total ·
-          Período: <strong id="footer-period">—</strong> ·
-          Costo estimado: <strong id="footer-costo">—</strong>
-          <div style="font-size:11px;color:rgba(255,149,0,0.7);margin-top:4px">
-            ⚡ Solo se pide lo necesario para 7 días · sin sobrestock · Pollo y Vacuno incluyen +1 caja stock de seguridad (debut)
+          <div style="font-size:13px;color:var(--driftwood)">
+            <strong style="color:var(--ink);font-size:15px" id="footer-cajas">—</strong> cajas en total ·
+            Período: <strong style="color:var(--ocean-deep)" id="footer-period">—</strong>
           </div>
+          <div class="footer-totals">
+            <div class="footer-total-item">
+              <div class="footer-total-label">Subtotal neto</div>
+              <div class="footer-total-val" id="footer-neto">—</div>
+            </div>
+            <div class="footer-total-item">
+              <div class="footer-total-label">IVA 19%</div>
+              <div class="footer-total-val" style="color:var(--driftwood)" id="footer-iva">—</div>
+            </div>
+            <div class="footer-total-item">
+              <div class="footer-total-label">Total bruto</div>
+              <div class="footer-total-val accent" id="footer-bruto">—</div>
+            </div>
+          </div>
+          <div class="footer-note">⚡ Solo se pide lo necesario para 7 días · sin sobrestock · Pollo y Vacuno incluyen +1 caja stock de seguridad (debut)</div>
         </div>
-        <button class="btn-generate" onclick="generarPedido()">
-          📋 Generar pedido
-        </button>
+        <button class="btn-generate" onclick="generarPedido()">📋 Generar pedido</button>
       </div>
 
       <!-- Diagnóstico del modelo -->
       <div class="diagnostico">
         <div class="diagnostico-header" onclick="toggleDiag()">
           <div class="diagnostico-title">
-            <span>🔬</span> Diagnóstico del modelo de demanda
+            <span>🔬</span>
+            Diagnóstico del modelo de demanda
             <span class="model-tag">Híbrido por SKU</span>
           </div>
-          <span id="diag-arrow" style="color:rgba(255,255,255,0.3);font-size:12px">▼ Ver detalle</span>
+          <span class="diagnostico-arrow" id="diag-arrow">▼ Ver detalle</span>
         </div>
         <div class="diagnostico-body" id="diag-body">
-          <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px">
+          <p style="font-size:12px;color:var(--driftwood);margin-bottom:14px;font-weight:300">
             Backtesting walk-forward, últimas 8 semanas. Cada SKU usa el modelo con menor MAPE histórico. Naive descartado (85.7% error promedio).
           </p>
-          <!-- Barras MAPE global -->
           <div class="mape-bar-wrap">
             <span class="mape-label">SES</span>
-            <div class="mape-bar-bg"><div class="mape-bar-fill" style="width:60.4%;background:#5AC8FA"></div></div>
-            <span class="mape-val" style="color:#5AC8FA">60.4%</span>
-            <span style="font-size:10px;color:rgba(255,255,255,0.3)">5/10 SKUs</span>
+            <div class="mape-bar-bg"><div class="mape-bar-fill" style="width:60.4%;background:var(--ocean-light)"></div></div>
+            <span class="mape-val" style="color:var(--ocean-mid)">60.4%</span>
+            <span style="font-size:10px;color:var(--driftwood);font-weight:300">5/10 SKUs</span>
           </div>
           <div class="mape-bar-wrap">
             <span class="mape-label">Promedio</span>
-            <div class="mape-bar-bg"><div class="mape-bar-fill" style="width:61.7%;background:#FF9500"></div></div>
-            <span class="mape-val" style="color:#FF9500">61.7%</span>
-            <span style="font-size:10px;color:rgba(255,255,255,0.3)">5/10 SKUs</span>
+            <div class="mape-bar-bg"><div class="mape-bar-fill" style="width:61.7%;background:var(--sunset-org)"></div></div>
+            <span class="mape-val" style="color:var(--sunset-org)">61.7%</span>
+            <span style="font-size:10px;color:var(--driftwood);font-weight:300">5/10 SKUs</span>
           </div>
           <div class="mape-bar-wrap">
             <span class="mape-label">Naive</span>
-            <div class="mape-bar-bg"><div class="mape-bar-fill" style="width:85.7%;background:rgba(255,255,255,0.2)"></div></div>
-            <span class="mape-val" style="color:rgba(255,255,255,0.35)">85.7%</span>
-            <span style="font-size:10px;color:rgba(255,59,48,0.6)">0/10 SKUs</span>
+            <div class="mape-bar-bg"><div class="mape-bar-fill" style="width:85.7%;background:var(--sand-dark)"></div></div>
+            <span class="mape-val" style="color:var(--driftwood)">85.7%</span>
+            <span style="font-size:10px;color:var(--sunset-pink);font-weight:300">0/10 SKUs</span>
           </div>
-          <!-- Tabla por SKU -->
           <table class="prec-table" id="prec-table"></table>
-          <p style="font-size:11px;color:rgba(255,149,0,0.6);margin-top:10px">
-            ⚡ Producto debut recomendado para clientes nuevos: <strong style="color:#FF9500">Pollo (SKU 499)</strong> y <strong style="color:#FF9500">Vacuno (SKU 500)</strong> — elegidos en 1ª compra en 56/128 debuts registrados.
+          <p style="font-size:11px;color:var(--sunset-org);margin-top:12px;font-weight:300">
+            ⚡ Producto debut recomendado para clientes nuevos: <strong>Pollo (SKU 499)</strong> y <strong>Vacuno (SKU 500)</strong> — elegidos en 1ª compra en 56/128 debuts registrados.
           </p>
         </div>
       </div>
@@ -460,61 +1256,55 @@
 </div><!-- /main -->
 
 <script>
-// demVenta: mejor modelo por SKU (backtesting walk-forward, MAPE mínimo)
-// stock: real Bsale API 2026-05-10 · demConsumo: promedio 4 semanas
+// stock: null = pendiente de fetch. Nunca hardcodear stock aquí.
 const PRODUCTS = [
-  { sku:'500',  nombre:'Dieta de Vacuno',   variante:'4 kg', demVenta:4.22, demConsumo:0.25, demNuevos:1.10, debut:true,  stockSeg:1, stock:0, costo:17100, modelo:'SES'      },
-  { sku:'499',  nombre:'Dieta de Pollo',    variante:'4 kg', demVenta:3.25, demConsumo:0.25, demNuevos:0.94, debut:true,  stockSeg:1, stock:0, costo:16800, modelo:'Promedio'  },
-  { sku:'494',  nombre:'Hueso Recreativo',  variante:'S',    demVenta:3.25, demConsumo:0.00, demNuevos:0.00, debut:false, stock:6, costo:2000,  modelo:'Promedio'  },
-  { sku:'502',  nombre:'Dieta de Cordero',  variante:'4 kg', demVenta:2.75, demConsumo:0.25, demNuevos:0.16, debut:false, stock:0, costo:17500, modelo:'Promedio'  },
-  { sku:'501',  nombre:'Dieta de Pavo',     variante:'4 kg', demVenta:2.00, demConsumo:0.25, demNuevos:0.00, debut:false, stock:1, costo:20000, modelo:'Promedio'  },
-  { sku:'503',  nombre:'Dieta de Salmón',   variante:'4 kg', demVenta:1.72, demConsumo:0.25, demNuevos:0.39, debut:false, stock:1, costo:17000, modelo:'SES'       },
-  { sku:'495',  nombre:'Hueso Recreativo',  variante:'XL',   demVenta:1.18, demConsumo:0.00, demNuevos:0.00, debut:false, stock:2, costo:3000,  modelo:'SES'       },
-  { sku:'504',  nombre:'Dieta de Cerdo',    variante:'4 kg', demVenta:0.75, demConsumo:0.50, demNuevos:0.47, debut:false, stock:1, costo:16500, modelo:'Promedio'  },
-  { sku:'1883', nombre:'Cocido de Vacuno',  variante:'4 kg', demVenta:0.58, demConsumo:0.00, demNuevos:0.47, debut:false, stock:1, costo:26500, modelo:'SES'       },
-  { sku:'1884', nombre:'Cocido de Pollo',   variante:'4 kg', demVenta:0.22, demConsumo:0.00, demNuevos:0.00, debut:false, stock:0, costo:26500, modelo:'SES'       },
+  { sku:'500',  nombre:'Dieta de Vacuno',   variante:'4 kg', demVenta:4.22, demConsumo:0.25, demNuevos:1.10, debut:true,  stockSeg:1, stock:null, costo:20000, modelo:'SES'     },
+  { sku:'499',  nombre:'Dieta de Pollo',    variante:'4 kg', demVenta:3.25, demConsumo:0.25, demNuevos:0.94, debut:true,  stockSeg:1, stock:null, costo:15500, modelo:'SES'     },
+  { sku:'494',  nombre:'Hueso Recreativo',  variante:'S',    demVenta:3.25, demConsumo:0.00, demNuevos:0.00, debut:false, stockSeg:0, stock:null, costo:2000,  modelo:'Promedio'},
+  { sku:'502',  nombre:'Dieta de Cordero',  variante:'4 kg', demVenta:2.75, demConsumo:0.25, demNuevos:0.16, debut:false, stockSeg:0, stock:null, costo:20000, modelo:'Promedio'},
+  { sku:'501',  nombre:'Dieta de Pavo',     variante:'4 kg', demVenta:2.00, demConsumo:0.25, demNuevos:0.00, debut:false, stockSeg:0, stock:null, costo:20000, modelo:'Promedio'},
+  { sku:'503',  nombre:'Dieta de Salmón',   variante:'4 kg', demVenta:1.72, demConsumo:0.25, demNuevos:0.39, debut:false, stockSeg:0, stock:null, costo:17000, modelo:'SES'     },
+  { sku:'495',  nombre:'Hueso Recreativo',  variante:'XL',   demVenta:0.88, demConsumo:0.38, demNuevos:0.00, debut:false, stockSeg:0, stock:null, costo:3000,  modelo:'Promedio'},
+  { sku:'504',  nombre:'Dieta de Cerdo',    variante:'4 kg', demVenta:0.75, demConsumo:0.50, demNuevos:0.47, debut:false, stockSeg:0, stock:null, costo:16500, modelo:'Promedio'},
+  { sku:'1883', nombre:'Cocido de Vacuno',  variante:'4 kg', demVenta:0.58, demConsumo:0.00, demNuevos:0.47, debut:false, stockSeg:0, stock:null, costo:26500, modelo:'SES'     },
+  { sku:'1884', nombre:'Cocido de Pollo',   variante:'4 kg', demVenta:0.22, demConsumo:0.00, demNuevos:0.00, debut:false, stockSeg:0, stock:null, costo:21500, modelo:'Promedio'},
 ];
 
-// Precisión por SKU (backtesting)
 const MODELO_PREC = [
-  { sku:'500',  nombre:'Dieta de Vacuno',  mejor:'SES',      ses:25.6,  avg:25.9,  naive:39.2  },
-  { sku:'499',  nombre:'Dieta de Pollo',   mejor:'Promedio', ses:77.3,  avg:74.1,  naive:102.7 },
-  { sku:'494',  nombre:'Hueso Recr. S',    mejor:'Promedio', ses:42.8,  avg:36.3,  naive:73.3  },
-  { sku:'502',  nombre:'Dieta de Cordero', mejor:'Promedio', ses:77.4,  avg:71.1,  naive:106.2 },
-  { sku:'501',  nombre:'Dieta de Pavo',    mejor:'Promedio', ses:70.0,  avg:67.0,  naive:103.6 },
-  { sku:'503',  nombre:'Dieta de Salmón',  mejor:'SES',      ses:56.8,  avg:75.9,  naive:67.9  },
-  { sku:'495',  nombre:'Hueso Recr. XL',   mejor:'SES',      ses:62.3,  avg:67.7,  naive:87.5  },
-  { sku:'504',  nombre:'Dieta de Cerdo',   mejor:'Promedio', ses:42.1,  avg:40.8,  naive:110.0 },
-  { sku:'1883', nombre:'Cocido Vacuno',     mejor:'SES',      ses:52.0,  avg:58.3,  naive:66.7  },
-  { sku:'1884', nombre:'Cocido Pollo',      mejor:'SES',      ses:97.5,  avg:100.0, naive:100.0 },
+  { sku:'500',  nombre:'Dieta de Vacuno',  mejor:'SES',      ses:41.0,  avg:41.6,  naive:51.6  },
+  { sku:'499',  nombre:'Dieta de Pollo',   mejor:'SES',      ses:66.8,  avg:75.9,  naive:89.1  },
+  { sku:'494',  nombre:'Hueso Recr. S',    mejor:'Promedio', ses:46.6,  avg:41.8,  naive:76.7  },
+  { sku:'502',  nombre:'Dieta de Cordero', mejor:'Promedio', ses:73.2,  avg:71.0,  naive:98.6  },
+  { sku:'501',  nombre:'Dieta de Pavo',    mejor:'Promedio', ses:56.4,  avg:54.8,  naive:96.2  },
+  { sku:'503',  nombre:'Dieta de Salmón',  mejor:'SES',      ses:40.8,  avg:41.4,  naive:47.5  },
+  { sku:'495',  nombre:'Hueso Recr. XL',   mejor:'Promedio', ses:47.1,  avg:45.5,  naive:58.3  },
+  { sku:'504',  nombre:'Dieta de Cerdo',   mejor:'Promedio', ses:41.4,  avg:34.9,  naive:100.0 },
+  { sku:'1883', nombre:'Cocido Vacuno',     mejor:'SES',      ses:64.0,  avg:75.0,  naive:75.0  },
+  { sku:'1884', nombre:'Cocido Pollo',      mejor:'Promedio', ses:98.8,  avg:93.8,  naive:100.0 },
 ];
 
-// Clientes saltados recientes (< 60 días, sin "sin nombre")
 const SALTADOS = [
-  { nombre:'Anabella Jimenez',    prox_visita:'2026-05-09', dias_sin_compra:32, intervalo:31.5, neto_total:152562, sku_favorito:'500' },
-  { nombre:'German Weber',        prox_visita:'2026-05-04', dias_sin_compra:26, intervalo:20.6, neto_total:197631, sku_favorito:'487' },
-  { nombre:'Maria Soledad Poveda',prox_visita:'2026-05-04', dias_sin_compra:38, intervalo:32.5, neto_total:77706,  sku_favorito:'500' },
-  { nombre:'Rodrigo Azua',        prox_visita:'2026-05-03', dias_sin_compra:23, intervalo:16.8, neto_total:274020, sku_favorito:'504' },
-  { nombre:'Andrea Reusser',      prox_visita:'2026-05-01', dias_sin_compra:31, intervalo:22.0, neto_total:48722,  sku_favorito:'503' },
-  { nombre:'Fabian Elorriaga',    prox_visita:'2026-04-28', dias_sin_compra:27, intervalo:22.5, neto_total:49450,  sku_favorito:'489' },
+  { nombre:'Anabella Jimenez',     prox_visita:'2026-05-09', dias_sin_compra:32, intervalo:31.5, neto_total:152562, sku_favorito:'500' },
+  { nombre:'German Weber',         prox_visita:'2026-05-04', dias_sin_compra:26, intervalo:20.6, neto_total:197631, sku_favorito:'487' },
+  { nombre:'Maria Soledad Poveda', prox_visita:'2026-05-04', dias_sin_compra:38, intervalo:32.5, neto_total:77706,  sku_favorito:'500' },
+  { nombre:'Rodrigo Azua',         prox_visita:'2026-05-03', dias_sin_compra:23, intervalo:16.8, neto_total:274020, sku_favorito:'504' },
+  { nombre:'Andrea Reusser',       prox_visita:'2026-05-01', dias_sin_compra:31, intervalo:22.0, neto_total:48722,  sku_favorito:'503' },
+  { nombre:'Fabian Elorriaga',     prox_visita:'2026-04-28', dias_sin_compra:27, intervalo:22.5, neto_total:49450,  sku_favorito:'489' },
 ];
 
-// ── Mapeo SKU → nombre corto ──
 const SKU_NAMES = {
   '499':'Pollo','500':'Vacuno','501':'Pavo','502':'Cordero',
   '503':'Salmón','504':'Cerdo','1883':'Coc. Vacuno','1884':'Coc. Pollo',
   '494':'Hueso S','495':'Hueso XL',
 };
 
-// ── Clientes esperados esta semana (predicción por frecuencia) ──
 const ESPERADOS = [
-  { nombre:'Boris Lopicich',   prox_visita:'2026-05-11', intervalo:29.8, neto_total:156505,  sku_favorito:'500' },
-  { nombre:'Fabiola Lopez',    prox_visita:'2026-05-13', intervalo:23.6, neto_total:210859,  sku_favorito:'500' },
-  { nombre:'Rosario Gonzalez', prox_visita:'2026-05-13', intervalo:85.0, neto_total:7714,    sku_favorito:'495' },
-  { nombre:'Ricardo Mella',    prox_visita:'2026-05-17', intervalo:33.0, neto_total:612613,  sku_favorito:'499' },
+  { nombre:'Boris Lopicich',   prox_visita:'2026-05-11', intervalo:29.8, neto_total:156505, sku_favorito:'500' },
+  { nombre:'Fabiola Lopez',    prox_visita:'2026-05-13', intervalo:23.6, neto_total:210859, sku_favorito:'500' },
+  { nombre:'Rosario Gonzalez', prox_visita:'2026-05-13', intervalo:85.0, neto_total:7714,   sku_favorito:'495' },
+  { nombre:'Ricardo Mella',    prox_visita:'2026-05-17', intervalo:33.0, neto_total:612613, sku_favorito:'499' },
 ];
 
-// ── Top 3 compradores (excluye "sin cliente") ──
 const TOP3 = [
   { nombre:'Roxana Werner',  neto_total:832445, visitas:5,  ultima_visita:'2026-04-20', sku_favorito:'499' },
   { nombre:'Jackeline Nava', neto_total:637184, visitas:28, ultima_visita:'2026-04-15', sku_favorito:'494' },
@@ -549,17 +1339,17 @@ function renderPrecision() {
     <th style="text-align:center">Modelo usado</th>
   </tr></thead><tbody>` +
   MODELO_PREC.map(r => {
-    const cls  = r.mejor==='SES' ? 'model-ses' : 'model-avg';
+    const clsB = r.mejor==='SES' ? 'model-ses' : 'model-avg';
     const best = (mape, modelo) => r.mejor===modelo
-      ? `<strong style="color:${modelo==='SES'?'#5AC8FA':'#FF9500'}">${mape}%</strong>`
-      : `${mape}%`;
+      ? `<strong style="color:${modelo==='SES'?'var(--ocean-mid)':'var(--sunset-org)'}">${mape}%</strong>`
+      : `<span style="color:var(--driftwood)">${mape}%</span>`;
     return `<tr>
-      <td style="color:rgba(255,255,255,0.4)">${r.sku}</td>
+      <td style="color:var(--driftwood);font-weight:300">${r.sku}</td>
       <td>${r.nombre}</td>
       <td style="text-align:right">${best(r.ses,'SES')}</td>
       <td style="text-align:right">${best(r.avg,'Promedio')}</td>
-      <td style="text-align:right;color:rgba(255,255,255,0.3)">${r.naive}%</td>
-      <td style="text-align:center"><span class="mejor-badge model-badge ${cls}">${r.mejor}</span></td>
+      <td style="text-align:right;color:var(--driftwood);font-weight:300">${r.naive}%</td>
+      <td style="text-align:center"><span class="mejor-badge model-badge ${clsB}">${r.mejor}</span></td>
     </tr>`;
   }).join('') + '</tbody>';
 }
@@ -567,7 +1357,6 @@ function renderPrecision() {
 function renderClientes() {
   const hoy = new Date(); hoy.setHours(0,0,0,0);
 
-  // Esperados
   document.getElementById('clientes-semana').innerHTML = ESPERADOS.map(c => {
     const prox = new Date(c.prox_visita + 'T00:00:00');
     const dias = Math.round((prox - hoy) / 86400000);
@@ -582,31 +1371,29 @@ function renderClientes() {
       </div>
       <div class="client-right">
         <div class="${cls}">${txt}</div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:2px">${fmtCLP(c.neto_total)}</div>
+        <div style="font-size:10px;color:var(--driftwood);margin-top:2px;font-weight:300">${fmtCLP(c.neto_total)}</div>
       </div>
     </div>`;
   }).join('');
 
-  // Saltados
   document.getElementById('clientes-saltados').innerHTML = SALTADOS.map(c => {
     const flav = SKU_NAMES[c.sku_favorito] || c.sku_favorito;
     return `<div class="client-row skipped">
-      <div class="client-avatar" style="background:rgba(255,149,0,0.15);color:#FF9500">${initials(c.nombre)}</div>
+      <div class="client-avatar warn">${initials(c.nombre)}</div>
       <div style="overflow:hidden">
         <div class="client-name">${c.nombre}</div>
-        <div class="skipped-label">⚠ En riesgo · esperado ${c.prox_visita} · posible compra en otro lugar</div>
+        <div class="skipped-label">⚠ En riesgo · esperado ${c.prox_visita}</div>
         <div class="client-meta">Cada ${c.intervalo.toFixed(0)} días · fav: ${flav}</div>
       </div>
       <div class="client-right">
-        <div style="font-size:12px;font-weight:700;color:#FF9500">${c.dias_sin_compra}d sin comprar</div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:2px">${fmtCLP(c.neto_total)}</div>
+        <div class="days-urgent">${c.dias_sin_compra}d sin comprar</div>
+        <div style="font-size:10px;color:var(--driftwood);margin-top:2px;font-weight:300">${fmtCLP(c.neto_total)}</div>
       </div>
     </div>`;
   }).join('');
 
-  // Top 3
   document.getElementById('top3-clientes').innerHTML = TOP3.map((c, i) => {
-    const flav = SKU_NAMES[c.sku_favorito] || c.sku_favorito;
+    const flav  = SKU_NAMES[c.sku_favorito] || c.sku_favorito;
     const medal = ['🥇','🥈','🥉'][i];
     return `<div class="client-row">
       <span class="rank-emoji">${medal}</span>
@@ -616,16 +1403,15 @@ function renderClientes() {
         <div class="client-meta">${c.visitas} visitas · ♥ ${flav} · últ. ${c.ultima_visita}</div>
       </div>
       <div class="client-right">
-        <div style="font-size:13px;font-weight:700;color:#fff">${fmtCLP(c.neto_total)}</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--ocean-deep)">${fmtCLP(c.neto_total)}</div>
       </div>
     </div>`;
   }).join('');
 }
 
-// ── Calcular próximo martes ──
 function nextTuesday(from) {
   const d = new Date(from);
-  const day = d.getDay(); // 0=dom, 2=mar
+  const day = d.getDay();
   const daysUntil = (2 - day + 7) % 7 || 7;
   d.setDate(d.getDate() + daysUntil);
   d.setHours(0,0,0,0);
@@ -640,31 +1426,25 @@ function fmtCLP(n) {
   return '$' + Math.round(n).toLocaleString('es-CL');
 }
 
-// ── Calcular pedido: max(0, ceil(demTotal + stockSeg - stock)) ──
-// stockSeg = 1 en productos debut para garantizar 1 caja disponible para nuevos compradores
 function calcPedir(p) {
   const demTotal = p.demVenta + p.demConsumo;
   return Math.max(0, Math.ceil(demTotal + (p.stockSeg || 0) - p.stock));
 }
 
 function estadoPill(stock, demTotal) {
-  if (stock <= 0)         return '<span class="pill pill-red">Sin stock</span>';
-  if (stock < demTotal * 0.5) return '<span class="pill pill-red">Crítico</span>';
-  if (stock < demTotal)   return '<span class="pill pill-amber">Bajo</span>';
-  return '<span class="pill pill-green">Normal</span>';
+  if (stock <= 0)              return '<span class="pill pill-red"><span class="pill-dot"></span>Sin stock</span>';
+  if (stock < demTotal * 0.5)  return '<span class="pill pill-red"><span class="pill-dot"></span>Crítico</span>';
+  if (stock < demTotal)        return '<span class="pill pill-amber"><span class="pill-dot"></span>Bajo</span>';
+  return '<span class="pill pill-green"><span class="pill-dot"></span>Normal</span>';
 }
 
-// ── Render tabla ──
 function renderTable() {
   const tbody = document.getElementById('products-tbody');
-  let totalCajas = 0, totalCosto = 0;
   let totalVentas = 0, totalConsumo = 0;
 
   tbody.innerHTML = PRODUCTS.map(p => {
     const demTotal = p.demVenta + p.demConsumo;
     const pedir    = calcPedir(p);
-    totalCajas += pedir;
-    totalCosto += pedir * p.costo;
     totalVentas  += p.demVenta;
     totalConsumo += p.demConsumo;
 
@@ -685,8 +1465,8 @@ function renderTable() {
         <input class="qty-input" type="number" value="${pedir}" min="0"
           oninput="updateTotals()"
           data-costo="${p.costo}"
-          style="${pedir === 0 ? 'opacity:.4' : ''}">
-        ${p.stockSeg ? '<div style="font-size:9px;color:#34C759;margin-top:3px">+1 seg. debut</div>' : ''}
+          style="${pedir === 0 ? 'opacity:.35' : ''}">
+        ${p.stockSeg ? '<div style="font-size:9px;color:var(--kelp);margin-top:3px;font-weight:500">+1 seg. debut</div>' : ''}
       </td>
     </tr>`;
   }).join('');
@@ -706,39 +1486,108 @@ function updateTotals() {
     cajas += q;
     costo += q * parseFloat(inp.dataset.costo);
   });
+  const iva   = Math.round(costo * 0.19);
+  const bruto = costo + iva;
   document.getElementById('kpi-pedir').textContent    = cajas;
   document.getElementById('footer-cajas').textContent = cajas;
-  document.getElementById('footer-costo').textContent = fmtCLP(costo);
+  document.getElementById('footer-neto').textContent  = fmtCLP(costo);
+  document.getElementById('footer-iva').textContent   = fmtCLP(iva);
+  document.getElementById('footer-bruto').textContent = fmtCLP(bruto);
 }
 
-// ── Inicializar fechas ──
 function initDates() {
-  const hoy     = new Date();
+  const hoy    = new Date();
   const martes  = nextTuesday(hoy);
   const martes2 = nextTuesday(new Date(martes.getTime() + 86400000));
   const dias    = Math.round((martes - hoy) / 86400000);
 
-  document.getElementById('next-tuesday').textContent = fmtDate(martes);
-  document.getElementById('cover-period').textContent = fmtDate(martes) + ' → ' + fmtDate(martes2);
-  document.getElementById('days-counter').textContent = dias === 0 ? '¡Hoy!' : `en ${dias} día${dias>1?'s':''}`;
-  document.getElementById('title-date').textContent   = fmtDate(martes);
-  document.getElementById('footer-period').textContent= fmtDate(martes) + ' → ' + fmtDate(martes2);
+  document.getElementById('next-tuesday').textContent  = fmtDate(martes);
+  document.getElementById('cover-period').textContent  = fmtDate(martes) + ' → ' + fmtDate(martes2);
+  document.getElementById('days-counter').textContent  = dias === 0 ? '¡Hoy!' : `en ${dias} día${dias>1?'s':''}`;
+  document.getElementById('title-date').textContent    = fmtDate(martes);
+  document.getElementById('footer-period').textContent = fmtDate(martes) + ' → ' + fmtDate(martes2);
 }
 
-function showDetail() {
+const SUPABASE_URL  = 'https://xbvdwarnzavcfvxahnjo.supabase.co';
+const SUPABASE_KEY  = 'sb_publishable_DBGxlNEMDSmSz5M2w4CYRQ_ctOkR_L8';
+const MODELO_API    = 'https://infopet-qas.smconnection.cl/api/barf/modelo';
+
+function renderTableSkeleton() {
+  document.getElementById('products-tbody').innerHTML = PRODUCTS.map(() => `
+    <tr>
+      <td><div style="height:14px;background:var(--sand);border-radius:4px;width:140px"></div></td>
+      <td colspan="7" style="text-align:center;color:var(--driftwood);font-size:12px;font-weight:300;letter-spacing:1px">
+        Obteniendo stock desde Supabase…
+      </td>
+    </tr>`).slice(0,1).join('') + `
+    <tr><td colspan="8" style="padding:28px;text-align:center">
+      <div style="display:inline-flex;align-items:center;gap:10px;color:var(--driftwood);font-size:13px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite">
+          <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+        </svg>
+        Actualizando stock desde Bsale…
+      </div>
+    </td></tr>`;
+}
+
+async function fetchStockBarf() {
+  const skus = PRODUCTS.map(p => p.sku).join(',');
+  const r = await fetch(
+    `${SUPABASE_URL}/rest/v1/productos?sku=in.(${skus})&select=sku,stock_bsale`,
+    { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+  );
+  if (!r.ok) throw new Error(`Supabase error ${r.status}`);
+  const data = await r.json();
+  const map  = {};
+  data.forEach(row => { map[row.sku] = row.stock_bsale ?? 0; });
+  // Cualquier SKU sin resultado en productos = 0 (no existe en Bsale)
+  PRODUCTS.forEach(p => { p.stock = map[p.sku] ?? 0; });
+}
+
+async function fetchModelo() {
+  const r = await fetch(MODELO_API);
+  if (!r.ok) throw new Error(`modelo error ${r.status}`);
+  const { productos } = await r.json();
+  for (const p of productos) {
+    const local = PRODUCTS.find(x => x.sku === p.sku);
+    if (!local) continue;
+    local.demVenta   = p.demVenta;
+    local.demConsumo = p.demConsumo;
+    local.modelo     = p.modelo;
+  }
+}
+
+async function showDetail() {
   document.getElementById('view-providers').style.display = 'none';
-  document.getElementById('view-detail').style.display = 'block';
-  document.getElementById('topbar-title').textContent = 'Pedidos · Barf Chile';
+  document.getElementById('view-detail').style.display    = 'block';
+  document.getElementById('topbar-title').textContent     = 'Pedidos · Barf Chile';
+  document.getElementById('topbar-action').style.display  = 'none';
   initDates();
-  renderTable();
   renderClientes();
   renderPrecision();
+  renderTableSkeleton();
+
+  try {
+    // Stock y modelo corren en paralelo
+    await Promise.all([fetchStockBarf(), fetchModelo()]);
+    renderTable();
+    const now = new Date().toLocaleDateString('es-CL', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    document.querySelector('.detail-sub').innerHTML =
+      `Comida húmeda · 10 productos · Actualizado: <strong style="color:var(--kelp)">${now}</strong>
+       <span class="model-tag">⚡ Sonnet · SES híbrido</span>`;
+  } catch (e) {
+    document.getElementById('products-tbody').innerHTML =
+      `<tr><td colspan="8" style="padding:24px;text-align:center;color:var(--sunset-pink);font-size:13px">
+        ⚠ No se pudo conectar con el servidor. Revisa que QAS esté activo.
+      </td></tr>`;
+  }
 }
 
 function showProviders() {
-  document.getElementById('view-detail').style.display = 'none';
+  document.getElementById('view-detail').style.display    = 'none';
   document.getElementById('view-providers').style.display = 'block';
-  document.getElementById('topbar-title').textContent = 'Pedidos';
+  document.getElementById('topbar-title').textContent     = 'Pedidos';
+  document.getElementById('topbar-action').style.display  = 'inline-flex';
 }
 
 function generarPedido() {
