@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InfoPet · Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #0C1210;
+    --surface: rgba(255,255,255,0.06);
+    --border:  rgba(255,255,255,0.08);
+    --accent:  #2D6A4F;
+    --green:   #34C759;
+    --red:     #FF3B30;
+    --amber:   #FF9500;
+    --blue:    #5AC8FA;
+    --text:    #f1f5f9;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── Navbar ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    background: rgba(12,18,16,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+  }
+
+  .nav-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); }
+  .nav-logo-img { width: 24px; height: 24px; background: var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+  .nav-logo-name { font-size: 14px; font-weight: 600; }
+  .nav-logo-badge { font-size: 8px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; background: rgba(45,106,79,0.55); color: rgba(255,255,255,0.9); padding: 2px 7px; border-radius: 4px; }
+
+  .nav-links { display: flex; gap: 2px; }
+
+  .nav-link {
+    font-size: 12px; padding: 6px 12px; border-radius: 8px;
+    color: rgba(255,255,255,0.7); cursor: pointer; transition: all 0.15s;
+    white-space: nowrap; border: none; background: none; font-family: inherit;
+  }
+  .nav-link:hover { background: var(--surface); color: white; }
+  .nav-link.active { color: white; font-weight: 500; background: var(--surface); }
+
+  .nav-refresh {
+    background: transparent; border: 1px solid var(--border);
+    color: rgba(255,255,255,0.7); padding: 4px 10px; border-radius: 8px;
+    font-size: 12px; cursor: pointer; transition: all 0.15s; font-family: inherit;
+  }
+  .nav-refresh:hover { color: white; border-color: rgba(255,255,255,0.2); }
+
+  /* ── Page ── */
+  .page {
+    margin-top: 48px;
+    padding: 32px 24px 48px;
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .glass {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+  }
+
+  /* ── Header ── */
+  .page-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+
+  .page-header h1 { font-size: 36px; font-weight: 600; letter-spacing: -0.5px; margin-bottom: 4px; }
+  .page-header .date { font-size: 14px; color: rgba(255,255,255,0.7); }
+
+  .connected-badge {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; color: rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+    padding: 6px 14px; border-radius: 20px;
+  }
+
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; animation: pulse 2s infinite; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ── KPIs ── */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+
+  .kpi-card {
+    padding: 16px 20px;
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .kpi-value { font-size: 30px; font-weight: 700; line-height: 1; margin-bottom: 8px; tabular-nums: 1; }
+  .kpi-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.6); }
+  .kpi-accent { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; }
+
+  /* ── Quick Actions ── */
+  .actions-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 40px; }
+
+  .action-card {
+    background: var(--surface); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px; padding: 20px 12px;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    cursor: pointer; transition: all 0.15s; text-decoration: none; color: var(--text);
+  }
+
+  .action-card:hover { transform: scale(1.03); border-color: rgba(255,255,255,0.12); }
+
+  .action-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: rgba(255,255,255,0.6);
+    transition: all 0.15s;
+  }
+
+  .action-card:hover .action-icon { background: rgba(255,255,255,0.08); color: white; }
+  .action-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.7); }
+  .action-card:hover .action-label { color: white; }
+
+  /* ── Section title ── */
+  .section-title {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 3px; color: rgba(255,255,255,0.6);
+    margin-bottom: 16px;
+  }
+
+  /* ── Semaforo ── */
+  .semaforo-wrap { padding: 20px 24px; margin-bottom: 40px; }
+
+  .semaforo-row {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 16px;
+  }
+  .semaforo-row:last-child { margin-bottom: 0; }
+
+  .semaforo-label { width: 140px; flex-shrink: 0; font-size: 13px; color: rgba(255,255,255,0.7); }
+
+  .semaforo-bar-bg {
+    flex: 1; height: 20px; border-radius: 6px;
+    background: rgba(255,255,255,0.04); overflow: hidden;
+  }
+
+  .semaforo-bar-fill { height: 100%; border-radius: 6px; transition: width 0.7s ease; opacity: 0.85; }
+
+  .semaforo-count { width: 48px; text-align: right; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); font-variant-numeric: tabular-nums; }
+
+  /* ── Top Categorias ── */
+  .cats-wrap { margin-bottom: 40px; border-radius: 16px; overflow: hidden; }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead th {
+    padding: 12px 20px; text-align: left;
+    font-size: 9px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase;
+    color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody td { padding: 12px 20px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .cat-num { color: rgba(255,255,255,0.4); font-size: 12px; margin-right: 4px; }
+  .cat-name { color: rgba(255,255,255,0.9); font-weight: 500; }
+  .cat-count { text-align: right; font-weight: 600; color: rgba(255,255,255,0.8); font-variant-numeric: tabular-nums; }
+
+  /* ── Footer ── */
+  .page-footer { text-align: center; padding: 24px 0; border-top: 1px solid rgba(255,255,255,0.06); }
+  .page-footer p { font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 1px; }
+
+  @media (max-width: 768px) {
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+    .actions-grid { grid-template-columns: repeat(3, 1fr); }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-img">🐾</div>
+    <span class="nav-logo-name">InfoPet</span>
+    <span class="nav-logo-badge">Panel</span>
+  </div>
+
+  <div class="nav-links">
+    <button class="nav-link active">Inicio</button>
+    <button class="nav-link">Carga</button>
+    <button class="nav-link">Facturas</button>
+    <button class="nav-link">Stock</button>
+    <button class="nav-link">Salidas</button>
+    <button class="nav-link">IA</button>
+    <button class="nav-link">Pedidos</button>
+    <button class="nav-link">Reportes</button>
+    <button class="nav-link">Bulk</button>
+    <button class="nav-link">Sync</button>
+  </div>
+
+  <button class="nav-refresh">↻</button>
+</nav>
+
+<!-- Page -->
+<div class="page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1>InfoPet Renaca</h1>
+      <p class="date" id="fecha"></p>
+    </div>
+    <div class="connected-badge">
+      <div class="dot"></div>
+      <span>Conectado</span>
+      <span id="sync-label" style="color:rgba(255,255,255,0.5)"></span>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="glass kpi-card">
+      <div class="kpi-value">925</div>
+      <div class="kpi-label">Productos con Stock</div>
+      <div class="kpi-accent" style="background:#34C759"></div>
+    </div>
+    <div class="glass kpi-card">
+      <div class="kpi-value">1.410</div>
+      <div class="kpi-label">Sin Stock</div>
+      <div class="kpi-accent" style="background:#FF3B30"></div>
+    </div>
+    <div class="glass kpi-card">
+      <div class="kpi-value">4.213</div>
+      <div class="kpi-label">Total Unidades</div>
+      <div class="kpi-accent" style="background:#5AC8FA"></div>
+    </div>
+    <div class="glass kpi-card">
+      <div class="kpi-value">1.818</div>
+      <div class="kpi-label">Catálogo Total</div>
+      <div class="kpi-accent" style="background:#FF9500"></div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="actions-grid">
+    <a class="action-card" href="#">
+      <div class="action-icon">+</div>
+      <span class="action-label">Cargar</span>
+    </a>
+    <a class="action-card" href="#">
+      <div class="action-icon">↓</div>
+      <span class="action-label">Salidas</span>
+    </a>
+    <a class="action-card" href="#">
+      <div class="action-icon">◉</div>
+      <span class="action-label">Stock</span>
+    </a>
+    <a class="action-card" href="#">
+      <div class="action-icon">≡</div>
+      <span class="action-label">IA</span>
+    </a>
+    <a class="action-card" href="#">
+      <div class="action-icon">▤</div>
+      <span class="action-label">Reportes</span>
+    </a>
+  </div>
+
+  <!-- Resumen Stock -->
+  <div class="section-title">Resumen de Stock</div>
+  <div class="glass semaforo-wrap">
+    <div class="semaforo-row">
+      <div class="semaforo-label">Urgente (sin stock)</div>
+      <div class="semaforo-bar-bg">
+        <div class="semaforo-bar-fill" style="width:88%;background:#FF3B30"></div>
+      </div>
+      <div class="semaforo-count">1.410</div>
+    </div>
+    <div class="semaforo-row">
+      <div class="semaforo-label">Bajo</div>
+      <div class="semaforo-bar-bg">
+        <div class="semaforo-bar-fill" style="width:12%;background:#FF9500"></div>
+      </div>
+      <div class="semaforo-count">189</div>
+    </div>
+    <div class="semaforo-row">
+      <div class="semaforo-label">OK</div>
+      <div class="semaforo-bar-bg">
+        <div class="semaforo-bar-fill" style="width:2%;background:#34C759"></div>
+      </div>
+      <div class="semaforo-count">24</div>
+    </div>
+  </div>
+
+  <!-- Top Categorías -->
+  <div class="section-title">Top Categorías</div>
+  <div class="glass cats-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Categoría</th>
+          <th style="text-align:right">Productos</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="cat-num">1.</span><span class="cat-name">Juguete Perro</span></td><td class="cat-count">79</td></tr>
+        <tr><td><span class="cat-num">2.</span><span class="cat-name">Snack Perro</span></td><td class="cat-count">73</td></tr>
+        <tr><td><span class="cat-num">3.</span><span class="cat-name">Perro comida seca</span></td><td class="cat-count">64</td></tr>
+        <tr><td><span class="cat-num">4.</span><span class="cat-name">Accesorio Perro</span></td><td class="cat-count">58</td></tr>
+        <tr><td><span class="cat-num">5.</span><span class="cat-name">Snack Gato</span></td><td class="cat-count">51</td></tr>
+        <tr><td><span class="cat-num">6.</span><span class="cat-name">Gato comida seca</span></td><td class="cat-count">47</td></tr>
+        <tr><td><span class="cat-num">7.</span><span class="cat-name">Accesorio Gato</span></td><td class="cat-count">39</td></tr>
+        <tr><td><span class="cat-num">8.</span><span class="cat-name">Higiene Perro</span></td><td class="cat-count">33</td></tr>
+        <tr><td><span class="cat-num">9.</span><span class="cat-name">Juguete Gato</span></td><td class="cat-count">28</td></tr>
+        <tr><td><span class="cat-num">10.</span><span class="cat-name">Correa y Arnés</span></td><td class="cat-count">22</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <div class="page-footer">
+    <p>InfoPet Renaca &middot; Panel de gestión &middot; 2026</p>
+  </div>
+
+</div>
+
+<script>
+  // Fecha actual
+  const now = new Date()
+  const fecha = now.toLocaleDateString('es-CL', { weekday:'long', day:'numeric', month:'long', year:'numeric' })
+  document.getElementById('fecha').textContent = fecha.charAt(0).toUpperCase() + fecha.slice(1)
+
+  // Sync label — simula "hace X min"
+  const syncMin = 3
+  document.getElementById('sync-label').textContent = `Ultima sync: hace ${syncMin} min`
+</script>
+</body>
+</html>
