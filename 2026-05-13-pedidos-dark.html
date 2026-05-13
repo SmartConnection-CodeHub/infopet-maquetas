@@ -689,17 +689,30 @@
       </div>
     </div>
 
-    <!-- Alerta entrega -->
-    <div class="delivery-alert">
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:18px">🚚</span>
-        <span>
-          Próxima entrega: <strong style="color:var(--amber)" id="next-tuesday"></strong>
-          &nbsp;·&nbsp;
-          Período: <strong id="cover-period"></strong>
-        </span>
+    <!-- Footer pedido -->
+    <div class="glass order-footer">
+      <div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.6)">
+          <strong style="color:white;font-size:15px" id="footer-cajas">—</strong> cajas en total ·
+          Período: <strong id="footer-period"></strong>
+        </div>
+        <div class="footer-totals">
+          <div>
+            <div class="ft-label">Subtotal neto</div>
+            <div class="ft-val" id="footer-neto">—</div>
+          </div>
+          <div>
+            <div class="ft-label">IVA 19%</div>
+            <div class="ft-val" style="color:rgba(255,255,255,0.5)" id="footer-iva">—</div>
+          </div>
+          <div>
+            <div class="ft-label">Total bruto</div>
+            <div class="ft-val accent" id="footer-bruto">—</div>
+          </div>
+        </div>
+        <div class="ft-note">⚡ Solo se pide lo necesario para 7 días · sin sobrestock · Pollo y Vacuno incluyen +1 caja de seguridad</div>
       </div>
-      <span class="delivery-badge" id="days-badge"></span>
+      <button class="btn-generate" onclick="alert('Pedido generado')">📋 Generar pedido</button>
     </div>
 
     <!-- KPIs -->
@@ -882,30 +895,17 @@
       </table>
     </div>
 
-    <!-- Footer pedido -->
-    <div class="glass order-footer">
-      <div>
-        <div style="font-size:13px;color:rgba(255,255,255,0.6)">
-          <strong style="color:white;font-size:15px" id="footer-cajas">—</strong> cajas en total ·
-          Período: <strong id="footer-period"></strong>
-        </div>
-        <div class="footer-totals">
-          <div>
-            <div class="ft-label">Subtotal neto</div>
-            <div class="ft-val" id="footer-neto">—</div>
-          </div>
-          <div>
-            <div class="ft-label">IVA 19%</div>
-            <div class="ft-val" style="color:rgba(255,255,255,0.5)" id="footer-iva">—</div>
-          </div>
-          <div>
-            <div class="ft-label">Total bruto</div>
-            <div class="ft-val accent" id="footer-bruto">—</div>
-          </div>
-        </div>
-        <div class="ft-note">⚡ Solo se pide lo necesario para 7 días · sin sobrestock · Pollo y Vacuno incluyen +1 caja de seguridad</div>
+    <!-- Alerta entrega -->
+    <div class="delivery-alert">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:18px">🚚</span>
+        <span>
+          Próxima entrega: <strong style="color:var(--amber)" id="next-tuesday"></strong>
+          &nbsp;·&nbsp;
+          Período: <strong id="cover-period"></strong>
+        </span>
       </div>
-      <button class="btn-generate" onclick="alert('Pedido generado')">📋 Generar pedido</button>
+      <span class="delivery-badge" id="days-badge"></span>
     </div>
 
     <!-- Diagnóstico -->
