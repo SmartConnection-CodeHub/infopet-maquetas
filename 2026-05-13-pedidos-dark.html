@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InfoPet · Pedidos (dark)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #0C1210;
+    --surface: rgba(255,255,255,0.06);
+    --border:  rgba(255,255,255,0.08);
+    --accent:  #2D6A4F;
+    --green:   #34C759;
+    --red:     #FF3B30;
+    --amber:   #FF9500;
+    --blue:    #5AC8FA;
+    --text:    #f1f5f9;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── Navbar ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    background: rgba(12,18,16,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--text);
+  }
+
+  .nav-logo-img {
+    width: 24px; height: 24px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+
+  .nav-logo-name { font-size: 14px; font-weight: 600; }
+
+  .nav-logo-badge {
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: rgba(45,106,79,0.55);
+    color: rgba(255,255,255,0.9);
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2px;
+  }
+
+  .nav-link {
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    border: none;
+    background: none;
+    font-family: inherit;
+  }
+
+  .nav-link:hover { background: var(--surface); color: white; }
+
+  .nav-link.active {
+    color: white;
+    font-weight: 500;
+    background: var(--surface);
+  }
+
+  .nav-refresh {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: rgba(255,255,255,0.7);
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+
+  .nav-refresh:hover { color: white; border-color: rgba(255,255,255,0.2); }
+
+  /* ── Page ── */
+  .page {
+    margin-top: 48px;
+    padding: 28px 24px;
+    max-width: 1100px;
+  }
+
+  /* ── Glass card ── */
+  .glass {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+  }
+
+  /* ── VISTA 1: Proveedores ── */
+  #view-providers { display: block; }
+  #view-detail    { display: none; }
+
+  .page-heading { margin-bottom: 24px; }
+  .page-heading h1 { font-size: 22px; font-weight: 600; }
+  .page-heading p  { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+
+  .providers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .provider-card {
+    background: white;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px;
+    padding: 24px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s;
+    background: rgba(255,255,255,0.04);
+  }
+
+  .provider-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #2E8EA6, var(--blue));
+    border-radius: 16px 16px 0 0;
+  }
+
+  .provider-card:hover {
+    border-color: rgba(90,200,250,0.3);
+    transform: translateY(-2px);
+  }
+
+  .provider-card.coming-soon {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  .provider-card.coming-soon::before {
+    background: linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+  }
+
+  .provider-card.coming-soon:hover { transform: none; border-color: var(--border); }
+
+  .provider-badge {
+    position: absolute;
+    top: 14px; right: 14px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+  }
+
+  .badge-active {
+    background: rgba(52,199,89,0.12);
+    color: var(--green);
+    border: 1px solid rgba(52,199,89,0.2);
+  }
+
+  .badge-soon {
+    background: rgba(255,149,0,0.1);
+    color: var(--amber);
+    border: 1px solid rgba(255,149,0,0.2);
+  }
+
+  .provider-icon { font-size: 24px; margin-bottom: 12px; }
+  .provider-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .provider-meta { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 16px; font-weight: 300; }
+
+  .provider-stats { display: flex; gap: 20px; }
+
+  .pstat-val {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--blue);
+    line-height: 1;
+  }
+
+  .pstat-lbl { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 3px; }
+
+  /* ── VISTA 2: Detalle ── */
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 20px;
+  }
+
+  .breadcrumb button {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.4);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: color 0.15s;
+  }
+
+  .breadcrumb button:hover { color: rgba(255,255,255,0.7); }
+  .breadcrumb .current { color: rgba(255,255,255,0.8); font-weight: 500; }
+
+  .detail-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .detail-icon {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    background: rgba(90,200,250,0.1);
+    border: 1px solid rgba(90,200,250,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .detail-title { font-size: 18px; font-weight: 600; }
+
+  .detail-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .model-tag {
+    font-size: 10px;
+    background: rgba(90,200,250,0.1);
+    color: var(--blue);
+    border: 1px solid rgba(90,200,250,0.25);
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .detail-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .sync-info { font-size: 11px; color: rgba(255,255,255,0.4); text-align: right; line-height: 1.6; }
+
+  /* ── Alerta entrega ── */
+  .delivery-alert {
+    background: rgba(255,149,0,0.06);
+    border: 1px solid rgba(255,149,0,0.2);
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .delivery-badge {
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(255,149,0,0.12);
+    color: var(--amber);
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,149,0,0.2);
+    white-space: nowrap;
+  }
+
+  /* ── KPIs ── */
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .kpi {
+    padding: 16px;
+    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s;
+  }
+
+  .kpi:hover { transform: translateY(-2px); }
+
+  .kpi::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 14px 14px 0 0;
+  }
+
+  .kpi-ocean::before { background: linear-gradient(90deg, #2E8EA6, var(--blue)); }
+  .kpi-sand::before  { background: linear-gradient(90deg, #8B7355, #C4A882); }
+  .kpi-green::before { background: linear-gradient(90deg, var(--accent), var(--green)); }
+  .kpi-amber::before { background: linear-gradient(90deg, #E87040, var(--red)); }
+
+  .kpi-label { font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 10px; }
+  .kpi-value { font-size: 34px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+  .kpi-ocean .kpi-value { color: var(--blue); }
+  .kpi-sand  .kpi-value { color: rgba(255,255,255,0.8); }
+  .kpi-green .kpi-value { color: var(--green); }
+  .kpi-amber .kpi-value { color: var(--amber); }
+  .kpi-sub { font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 300; }
+
+  /* ── Grids ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+
+  /* ── Clients panel ── */
+  .clients-head {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255,255,255,0.02);
+  }
+
+  .clients-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); }
+
+  .tab-bar { display: flex; gap: 4px; }
+
+  .tab-btn {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+
+  .tab-btn.active { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: white; }
+  .tab-btn.warn   { border-color: rgba(255,149,0,0.3); color: var(--amber); }
+
+  .client-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.12s;
+  }
+
+  .client-row:last-child { border-bottom: none; }
+  .client-row:hover { background: rgba(255,255,255,0.02); }
+
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(90,200,250,0.1);
+    border: 1px solid rgba(90,200,250,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700;
+    color: var(--blue);
+    flex-shrink: 0;
+  }
+
+  .avatar.warn { background: rgba(255,149,0,0.08); border-color: rgba(255,149,0,0.25); color: var(--amber); }
+
+  .client-name { font-size: 13px; font-weight: 500; }
+  .client-meta { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+  .client-right { margin-left: auto; text-align: right; flex-shrink: 0; }
+  .days-ok     { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); }
+  .days-soon   { font-size: 12px; font-weight: 700; color: var(--amber); }
+  .days-urgent { font-size: 12px; font-weight: 700; color: var(--red); }
+  .client-total{ font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+  /* ── Tabla pedido ── */
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-tag {
+    font-size: 10px;
+    font-weight: 500;
+    background: rgba(30,95,116,0.1);
+    color: var(--blue);
+    border: 1px solid rgba(30,95,116,0.2);
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  .table-wrap {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead th {
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody td {
+    padding: 13px 16px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: rgba(255,255,255,0.85);
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .td-right { text-align: right; font-variant-numeric: tabular-nums; }
+  .td-demand { text-align: right; font-size: 17px; font-weight: 700; color: white; }
+
+  .product-name { font-weight: 500; }
+  .product-sku  { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+  .debut-badge {
+    font-size: 9px;
+    background: rgba(52,199,89,0.1);
+    color: var(--green);
+    padding: 1px 5px;
+    border-radius: 4px;
+    margin-left: 5px;
+    font-weight: 600;
+  }
+
+  .model-badge {
+    font-size: 9px;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-weight: 600;
+    margin-left: 4px;
+  }
+
+  .model-ses { background: rgba(30,95,116,0.15); color: var(--blue); }
+  .model-avg { background: rgba(232,112,64,0.12); color: var(--amber); }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .pill-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+  .pill-green { background: rgba(52,199,89,0.1);  color: var(--green); border: 1px solid rgba(52,199,89,0.2); }
+  .pill-amber { background: rgba(255,149,0,0.1);  color: var(--amber); border: 1px solid rgba(255,149,0,0.2); }
+  .pill-red   { background: rgba(255,59,48,0.1);  color: var(--red);   border: 1px solid rgba(255,59,48,0.2); }
+
+  .qty-input {
+    width: 60px;
+    text-align: center;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 6px 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    font-family: inherit;
+  }
+
+  .qty-input:focus { outline: none; border-color: rgba(90,200,250,0.5); }
+
+  /* ── Footer pedido ── */
+  .order-footer {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .footer-totals { display: flex; gap: 28px; margin-top: 12px; align-items: flex-end; }
+  .ft-label { font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+  .ft-val   { font-size: 26px; font-weight: 700; line-height: 1; }
+  .ft-val.accent { color: var(--amber); font-size: 30px; }
+  .ft-note  { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 10px; font-weight: 300; }
+
+  .btn-generate {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: white;
+    font-weight: 500;
+    padding: 12px 24px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-generate:hover { background: rgba(255,255,255,0.12); }
+
+  /* ── Diagnóstico ── */
+  .diag-header {
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    background: rgba(255,255,255,0.02);
+    transition: background 0.15s;
+  }
+
+  .diag-header:hover { background: rgba(255,255,255,0.04); }
+
+  .diag-title { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.8); display: flex; align-items: center; gap: 8px; }
+  .diag-arrow { font-size: 11px; color: rgba(255,255,255,0.4); }
+  .diag-body  { padding: 16px 18px 18px; border-top: 1px solid var(--border); display: none; }
+  .diag-body.open { display: block; }
+
+  .mape-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .mape-lbl { font-size: 11px; color: rgba(255,255,255,0.4); width: 60px; text-align: right; font-weight: 300; }
+  .mape-bg  { flex: 1; height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+  .mape-fill{ height: 100%; border-radius: 3px; }
+  .mape-val { font-size: 14px; font-weight: 700; width: 44px; }
+
+  @media (max-width: 768px) {
+    .kpis { grid-template-columns: 1fr 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Navbar ── -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-img">🐾</div>
+    <span class="nav-logo-name">InfoPet</span>
+    <span class="nav-logo-badge">Panel</span>
+  </a>
+
+  <div class="nav-links">
+    <button class="nav-link" onclick="location.href='#'">Inicio</button>
+    <button class="nav-link">Carga</button>
+    <button class="nav-link">Facturas</button>
+    <button class="nav-link">Stock</button>
+    <button class="nav-link">Salidas</button>
+    <button class="nav-link">IA</button>
+    <button class="nav-link active" onclick="showProviders()">Pedidos</button>
+    <button class="nav-link">Reportes</button>
+    <button class="nav-link">Bulk</button>
+    <button class="nav-link">Sync</button>
+  </div>
+
+  <button class="nav-refresh" title="Forzar actualización">↻</button>
+</nav>
+
+<!-- ── Content ── -->
+<div class="page">
+
+  <!-- ═══════════ VISTA 1: Proveedores ═══════════ -->
+  <div id="view-providers">
+    <div class="page-heading">
+      <h1>Pedidos</h1>
+      <p>Gestión de pedidos por proveedor con análisis de demanda</p>
+    </div>
+
+    <div class="providers-grid">
+
+      <div class="provider-card" onclick="showDetail()">
+        <span class="provider-badge badge-active">Activo</span>
+        <div class="provider-icon">🥩</div>
+        <div class="provider-name">Barf Chile</div>
+        <div class="provider-meta">Comida húmeda · 10 productos activos</div>
+        <div class="provider-stats">
+          <div>
+            <div class="pstat-val">39</div>
+            <div class="pstat-lbl">Clientes activos</div>
+          </div>
+          <div>
+            <div class="pstat-val" style="color:var(--amber)">6</div>
+            <div class="pstat-lbl">En riesgo</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="provider-card coming-soon">
+        <span class="provider-badge badge-soon">Próximamente</span>
+        <div class="provider-icon">🐟</div>
+        <div class="provider-name">MOR / Bravery</div>
+        <div class="provider-meta">Alimento seco · En configuración</div>
+      </div>
+
+      <div class="provider-card coming-soon">
+        <span class="provider-badge badge-soon">Próximamente</span>
+        <div class="provider-icon">🐾</div>
+        <div class="provider-name">Otros proveedores</div>
+        <div class="provider-meta">En configuración</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════ VISTA 2: Barf Chile detalle ═══════════ -->
+  <div id="view-detail" style="display:none">
+
+    <div class="breadcrumb">
+      <button onclick="showProviders()">Pedidos</button>
+      <span>›</span>
+      <span class="current">Barf Chile</span>
+    </div>
+
+    <!-- Header -->
+    <div class="glass detail-header" style="margin-bottom:16px">
+      <div class="detail-icon">🥩</div>
+      <div>
+        <div class="detail-title">Barf Chile</div>
+        <div class="detail-sub">
+          Comida húmeda · 10 productos
+          <span class="model-tag">⚡ Sonnet · SES híbrido</span>
+        </div>
+      </div>
+      <div class="detail-actions">
+        <div class="sync-info">
+          Próx. pedido sugerido<br>
+          <strong style="color:var(--amber);font-size:14px">en 8 días</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alerta entrega -->
+    <div class="delivery-alert">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:18px">🚚</span>
+        <span>
+          Próxima entrega: <strong style="color:var(--amber)" id="next-tuesday"></strong>
+          &nbsp;·&nbsp;
+          Período: <strong id="cover-period"></strong>
+        </span>
+      </div>
+      <span class="delivery-badge" id="days-badge"></span>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpis">
+      <div class="glass kpi kpi-ocean">
+        <div class="kpi-label">Demanda venta / sem</div>
+        <div class="kpi-value">11.4</div>
+        <div class="kpi-sub">cajas · modelo SES</div>
+      </div>
+      <div class="glass kpi kpi-sand">
+        <div class="kpi-label">Consumo interno / sem</div>
+        <div class="kpi-value">3.2</div>
+        <div class="kpi-sub">cajas · prom 4 semanas</div>
+      </div>
+      <div class="glass kpi kpi-green">
+        <div class="kpi-label">Demanda total sem</div>
+        <div class="kpi-value">14.6</div>
+        <div class="kpi-sub">ventas + consumo interno</div>
+      </div>
+      <div class="glass kpi kpi-amber">
+        <div class="kpi-label">A pedir esta semana</div>
+        <div class="kpi-value" id="kpi-pedir">—</div>
+        <div class="kpi-sub">cajas · flujo optimizado</div>
+      </div>
+    </div>
+
+    <!-- Clientes -->
+    <div class="two-col">
+      <div class="glass" style="overflow:hidden">
+        <div class="clients-head">
+          <span class="clients-title">Clientes esta semana</span>
+          <div class="tab-bar">
+            <button class="tab-btn active" id="btn-esp" onclick="switchTab('esp')">Esperados (4)</button>
+            <button class="tab-btn warn"   id="btn-risk" onclick="switchTab('risk')">En riesgo (6)</button>
+          </div>
+        </div>
+        <div id="tab-esp">
+          <div class="client-row">
+            <div class="avatar">BL</div>
+            <div>
+              <div class="client-name">Boris Lopicich</div>
+              <div class="client-meta">mar 11 may · c/30d · ♥ Vacuno</div>
+            </div>
+            <div class="client-right">
+              <div class="days-soon">¡Hoy!</div>
+              <div class="client-total">$156.505</div>
+            </div>
+          </div>
+          <div class="client-row">
+            <div class="avatar">FL</div>
+            <div>
+              <div class="client-name">Fabiola Lopez</div>
+              <div class="client-meta">mié 13 may · c/24d · ♥ Vacuno</div>
+            </div>
+            <div class="client-right">
+              <div class="days-soon">En 2 días</div>
+              <div class="client-total">$210.859</div>
+            </div>
+          </div>
+          <div class="client-row">
+            <div class="avatar">RG</div>
+            <div>
+              <div class="client-name">Rosario González</div>
+              <div class="client-meta">mié 13 may · c/85d · ♥ Hueso XL</div>
+            </div>
+            <div class="client-right">
+              <div class="days-ok">En 2 días</div>
+              <div class="client-total">$7.714</div>
+            </div>
+          </div>
+          <div class="client-row">
+            <div class="avatar">RM</div>
+            <div>
+              <div class="client-name">Ricardo Mella</div>
+              <div class="client-meta">sáb 17 may · c/33d · ♥ Pollo</div>
+            </div>
+            <div class="client-right">
+              <div class="days-ok">En 6 días</div>
+              <div class="client-total">$612.613</div>
+            </div>
+          </div>
+        </div>
+        <div id="tab-risk" style="display:none">
+          <div class="client-row">
+            <div class="avatar warn">AJ</div>
+            <div>
+              <div class="client-name">Anabella Jimenez</div>
+              <div class="client-meta">⚠ esp. 09 may · c/32d · ♥ Vacuno</div>
+            </div>
+            <div class="client-right">
+              <div class="days-urgent">32d sin comprar</div>
+              <div class="client-total">$152.562</div>
+            </div>
+          </div>
+          <div class="client-row">
+            <div class="avatar warn">GW</div>
+            <div>
+              <div class="client-name">German Weber</div>
+              <div class="client-meta">⚠ esp. 04 may · c/21d</div>
+            </div>
+            <div class="client-right">
+              <div class="days-urgent">26d sin comprar</div>
+              <div class="client-total">$197.631</div>
+            </div>
+          </div>
+          <div class="client-row">
+            <div class="avatar warn">MP</div>
+            <div>
+              <div class="client-name">Maria S. Poveda</div>
+              <div class="client-meta">⚠ esp. 04 may · c/33d · ♥ Vacuno</div>
+            </div>
+            <div class="client-right">
+              <div class="days-urgent">38d sin comprar</div>
+              <div class="client-total">$77.706</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass" style="overflow:hidden">
+        <div class="clients-head">
+          <span class="clients-title">Top 3 compradores</span>
+        </div>
+        <div class="client-row">
+          <span style="font-size:18px;width:20px;flex-shrink:0">🥇</span>
+          <div class="avatar">RW</div>
+          <div>
+            <div class="client-name">Roxana Werner</div>
+            <div class="client-meta">5 compras · ♥ Pollo</div>
+          </div>
+          <div class="client-right">
+            <div style="font-size:16px;font-weight:700">$832.445</div>
+          </div>
+        </div>
+        <div class="client-row">
+          <span style="font-size:18px;width:20px;flex-shrink:0">🥈</span>
+          <div class="avatar">JN</div>
+          <div>
+            <div class="client-name">Jackeline Nava</div>
+            <div class="client-meta">28 compras · ♥ Hueso S</div>
+          </div>
+          <div class="client-right">
+            <div style="font-size:16px;font-weight:700">$637.184</div>
+          </div>
+        </div>
+        <div class="client-row">
+          <span style="font-size:18px;width:20px;flex-shrink:0">🥉</span>
+          <div class="avatar">RM</div>
+          <div>
+            <div class="client-name">Ricardo Mella</div>
+            <div class="client-meta">5 compras · ♥ Pollo</div>
+          </div>
+          <div class="client-right">
+            <div style="font-size:16px;font-weight:700">$612.613</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla productos -->
+    <div class="section-title">
+      Pedido martes <span id="title-date" style="color:rgba(255,255,255,0.6);font-weight:400"></span>
+      <span class="section-tag">SES/Prom híbrido · 7 días · +1 seg. debut</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th style="text-align:right">Dem. venta</th>
+            <th style="text-align:right">Consumo</th>
+            <th style="text-align:right">Total</th>
+            <th style="text-align:right">Stock</th>
+            <th>Estado</th>
+            <th style="text-align:right">Pedir</th>
+          </tr>
+        </thead>
+        <tbody id="products-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Footer pedido -->
+    <div class="glass order-footer">
+      <div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.6)">
+          <strong style="color:white;font-size:15px" id="footer-cajas">—</strong> cajas en total ·
+          Período: <strong id="footer-period"></strong>
+        </div>
+        <div class="footer-totals">
+          <div>
+            <div class="ft-label">Subtotal neto</div>
+            <div class="ft-val" id="footer-neto">—</div>
+          </div>
+          <div>
+            <div class="ft-label">IVA 19%</div>
+            <div class="ft-val" style="color:rgba(255,255,255,0.5)" id="footer-iva">—</div>
+          </div>
+          <div>
+            <div class="ft-label">Total bruto</div>
+            <div class="ft-val accent" id="footer-bruto">—</div>
+          </div>
+        </div>
+        <div class="ft-note">⚡ Solo se pide lo necesario para 7 días · sin sobrestock · Pollo y Vacuno incluyen +1 caja de seguridad</div>
+      </div>
+      <button class="btn-generate" onclick="alert('Pedido generado')">📋 Generar pedido</button>
+    </div>
+
+    <!-- Diagnóstico -->
+    <div class="glass" style="overflow:hidden">
+      <div class="diag-header" onclick="toggleDiag()">
+        <div class="diag-title">
+          <span>🔬</span>
+          Diagnóstico del modelo de demanda
+          <span class="model-tag">Híbrido por SKU</span>
+        </div>
+        <span class="diag-arrow" id="diag-arrow">▼ Ver detalle</span>
+      </div>
+      <div class="diag-body" id="diag-body">
+        <div class="mape-row">
+          <span class="mape-lbl">SES</span>
+          <div class="mape-bg"><div class="mape-fill" style="width:60.4%;background:var(--blue)"></div></div>
+          <span class="mape-val" style="color:var(--blue)">60.4%</span>
+          <span style="font-size:10px;color:rgba(255,255,255,0.3)">5/10 SKUs</span>
+        </div>
+        <div class="mape-row">
+          <span class="mape-lbl">Promedio</span>
+          <div class="mape-bg"><div class="mape-fill" style="width:61.7%;background:var(--amber)"></div></div>
+          <span class="mape-val" style="color:var(--amber)">61.7%</span>
+          <span style="font-size:10px;color:rgba(255,255,255,0.3)">5/10 SKUs</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /view-detail -->
+</div><!-- /page -->
+
+<script>
+const PRODUCTS = [
+  { sku:'500',  nombre:'Dieta de Vacuno',  variante:'4 kg', demVenta:4.22, demConsumo:0.25, debut:true,  stockSeg:1, stock:8,  costo:20000, modelo:'SES'     },
+  { sku:'499',  nombre:'Dieta de Pollo',   variante:'4 kg', demVenta:3.25, demConsumo:0.25, debut:true,  stockSeg:1, stock:5,  costo:15500, modelo:'SES'     },
+  { sku:'494',  nombre:'Hueso Recreativo', variante:'S',    demVenta:3.25, demConsumo:0.00, debut:false, stockSeg:0, stock:12, costo:2000,  modelo:'Promedio' },
+  { sku:'502',  nombre:'Dieta de Cordero', variante:'4 kg', demVenta:2.75, demConsumo:0.25, debut:false, stockSeg:0, stock:2,  costo:20000, modelo:'Promedio' },
+  { sku:'501',  nombre:'Dieta de Pavo',    variante:'4 kg', demVenta:2.00, demConsumo:0.25, debut:false, stockSeg:0, stock:3,  costo:20000, modelo:'Promedio' },
+  { sku:'503',  nombre:'Dieta de Salmón',  variante:'4 kg', demVenta:1.72, demConsumo:0.25, debut:false, stockSeg:0, stock:4,  costo:17000, modelo:'SES'     },
+  { sku:'495',  nombre:'Hueso Recreativo', variante:'XL',   demVenta:0.88, demConsumo:0.38, debut:false, stockSeg:0, stock:6,  costo:3000,  modelo:'Promedio' },
+  { sku:'504',  nombre:'Dieta de Cerdo',   variante:'4 kg', demVenta:0.75, demConsumo:0.50, debut:false, stockSeg:0, stock:1,  costo:16500, modelo:'Promedio' },
+  { sku:'1883', nombre:'Cocido de Vacuno', variante:'4 kg', demVenta:0.58, demConsumo:0.00, debut:false, stockSeg:0, stock:0,  costo:26500, modelo:'SES'     },
+  { sku:'1884', nombre:'Cocido de Pollo',  variante:'4 kg', demVenta:0.22, demConsumo:0.00, debut:false, stockSeg:0, stock:2,  costo:21500, modelo:'Promedio' },
+]
+
+function fmtCLP(n) { return '$' + Math.round(n).toLocaleString('es-CL') }
+
+function nextTuesday(from) {
+  const d = new Date(from)
+  const daysUntil = ((2 - d.getDay() + 7) % 7) || 7
+  d.setDate(d.getDate() + daysUntil); d.setHours(0,0,0,0)
+  return d
+}
+
+function fmtDate(d) {
+  return d.toLocaleDateString('es-CL', { weekday:'short', day:'numeric', month:'short' })
+}
+
+function pill(stock, demTotal) {
+  if (stock <= 0)             return '<span class="pill pill-red"><span class="pill-dot"></span>Sin stock</span>'
+  if (stock < demTotal * 0.5) return '<span class="pill pill-red"><span class="pill-dot"></span>Crítico</span>'
+  if (stock < demTotal)       return '<span class="pill pill-amber"><span class="pill-dot"></span>Bajo</span>'
+  return '<span class="pill pill-green"><span class="pill-dot"></span>Normal</span>'
+}
+
+function initDates() {
+  const hoy = new Date()
+  const mar  = nextTuesday(hoy)
+  const mar2 = nextTuesday(new Date(mar.getTime() + 86400000))
+  const dias = Math.round((mar - hoy) / 86400000)
+  document.getElementById('next-tuesday').textContent = fmtDate(mar)
+  document.getElementById('cover-period').textContent = fmtDate(mar) + ' → ' + fmtDate(mar2)
+  document.getElementById('days-badge').textContent = dias === 0 ? '¡Hoy!' : `en ${dias} día${dias !== 1 ? 's' : ''}`
+  document.getElementById('title-date').textContent = fmtDate(mar)
+  document.getElementById('footer-period').textContent = fmtDate(mar) + ' → ' + fmtDate(mar2)
+}
+
+function renderTable() {
+  const tbody = document.getElementById('products-tbody')
+  tbody.innerHTML = PRODUCTS.map(p => {
+    const demTotal = p.demVenta + p.demConsumo
+    const pedir    = Math.max(0, Math.ceil(demTotal + (p.stockSeg || 0) - p.stock))
+    const debut    = p.debut ? '<span class="debut-badge">★ debut</span>' : ''
+    const modelo   = `<span class="model-badge model-${p.modelo === 'SES' ? 'ses' : 'avg'}">${p.modelo}</span>`
+    return `<tr>
+      <td>
+        <div class="product-name">${p.nombre}${debut}</div>
+        <div class="product-sku">SKU ${p.sku} · ${p.variante}</div>
+      </td>
+      <td class="td-right">${p.demVenta.toFixed(1)} ${modelo}</td>
+      <td class="td-right" style="color:rgba(255,255,255,0.6)">${p.demConsumo.toFixed(1)}</td>
+      <td class="td-demand">${demTotal.toFixed(1)}</td>
+      <td class="td-right" style="color:rgba(255,255,255,0.7)">${p.stock}</td>
+      <td>${pill(p.stock, demTotal)}</td>
+      <td class="td-right">
+        <input class="qty-input" type="number" value="${pedir}" min="0"
+          oninput="updateTotals()" data-costo="${p.costo}"
+          style="${pedir === 0 ? 'opacity:.35' : ''}">
+        ${p.stockSeg ? '<div style="font-size:9px;color:var(--green);margin-top:3px;font-weight:500">+1 seg.debut</div>' : ''}
+      </td>
+    </tr>`
+  }).join('')
+  updateTotals()
+}
+
+function updateTotals() {
+  let cajas = 0, costo = 0
+  document.querySelectorAll('#products-tbody .qty-input').forEach(inp => {
+    const q = parseInt(inp.value) || 0
+    cajas += q; costo += q * parseFloat(inp.dataset.costo)
+  })
+  const iva = Math.round(costo * 0.19)
+  document.getElementById('kpi-pedir').textContent    = cajas
+  document.getElementById('footer-cajas').textContent = cajas
+  document.getElementById('footer-neto').textContent  = fmtCLP(costo)
+  document.getElementById('footer-iva').textContent   = fmtCLP(iva)
+  document.getElementById('footer-bruto').textContent = fmtCLP(costo + iva)
+}
+
+function showDetail() {
+  document.getElementById('view-providers').style.display = 'none'
+  document.getElementById('view-detail').style.display    = 'block'
+  initDates(); renderTable()
+}
+
+function showProviders() {
+  document.getElementById('view-detail').style.display    = 'none'
+  document.getElementById('view-providers').style.display = 'block'
+}
+
+function switchTab(tab) {
+  document.getElementById('tab-esp').style.display  = tab === 'esp'  ? 'block' : 'none'
+  document.getElementById('tab-risk').style.display = tab === 'risk' ? 'block' : 'none'
+  document.getElementById('btn-esp').classList.toggle('active',  tab === 'esp')
+  document.getElementById('btn-risk').classList.toggle('active', tab === 'risk')
+}
+
+function toggleDiag() {
+  const body = document.getElementById('diag-body')
+  const arrow = document.getElementById('diag-arrow')
+  const open = body.classList.toggle('open')
+  arrow.textContent = open ? '▲ Ocultar' : '▼ Ver detalle'
+}
+</script>
+</body>
+</html>
