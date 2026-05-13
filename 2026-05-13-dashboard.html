@@ -207,6 +207,67 @@
   .cat-name { color: rgba(255,255,255,0.9); font-weight: 500; }
   .cat-count { text-align: right; font-weight: 600; color: rgba(255,255,255,0.8); font-variant-numeric: tabular-nums; }
 
+  /* ── Flujo de Caja ── */
+  .flujo-card { padding: 24px; margin-bottom: 40px; }
+
+  .flujo-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .flujo-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); }
+
+  .flujo-period {
+    font-size: 10px; font-weight: 500; letter-spacing: 1px;
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    color: rgba(255,255,255,0.5); padding: 4px 12px; border-radius: 20px;
+  }
+
+  .flujo-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+
+  .flujo-kpi { text-align: center; }
+  .flujo-kpi-label { font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+  .flujo-kpi-val { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+  .flujo-kpi-sub { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 4px; }
+  .flujo-divider { width: 1px; background: var(--border); }
+
+  /* Chart */
+  .flujo-chart { display: flex; flex-direction: column; gap: 4px; }
+  .flujo-chart-header {
+    display: flex; justify-content: flex-end; gap: 16px;
+    margin-bottom: 12px;
+  }
+  .legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,0.45); }
+
+  .chart-row { display: flex; align-items: center; gap: 12px; }
+  .chart-label { width: 36px; font-size: 10px; color: rgba(255,255,255,0.35); text-align: right; flex-shrink: 0; }
+  .chart-bars { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+  .chart-bar-wrap { display: flex; align-items: center; gap: 6px; }
+  .chart-bar {
+    height: 14px; border-radius: 3px; transition: width 0.6s ease;
+    position: relative; min-width: 4px;
+  }
+  .chart-bar-val {
+    font-size: 10px; color: rgba(255,255,255,0.45);
+    white-space: nowrap; font-variant-numeric: tabular-nums;
+  }
+
+  .bar-ingreso { background: linear-gradient(90deg, rgba(52,199,89,0.7), rgba(52,199,89,0.4)); }
+  .bar-egreso  { background: linear-gradient(90deg, rgba(255,59,48,0.7),  rgba(255,59,48,0.4)); }
+
+  .chart-sep { height: 1px; background: rgba(255,255,255,0.04); margin: 6px 0; }
+
+  .balance-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);
+  }
+
+  .balance-label { font-size: 11px; color: rgba(255,255,255,0.4); }
+  .balance-bar-wrap { flex: 1; margin: 0 16px; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+  .balance-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--green), rgba(52,199,89,0.5)); }
+  .balance-val { font-size: 14px; font-weight: 700; color: var(--green); font-variant-numeric: tabular-nums; }
+
   /* ── Footer ── */
   .page-footer { text-align: center; padding: 24px 0; border-top: 1px solid rgba(255,255,255,0.06); }
   .page-footer p { font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 1px; }
@@ -360,6 +421,118 @@
         <tr><td><span class="cat-num">10.</span><span class="cat-name">Correa y Arnés</span></td><td class="cat-count">22</td></tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- Flujo de Caja -->
+  <div class="section-title">Flujo de Caja</div>
+  <div class="glass flujo-card">
+
+    <div class="flujo-header">
+      <span class="flujo-title">Ingresos vs Egresos</span>
+      <span class="flujo-period">Mayo 2026</span>
+    </div>
+
+    <!-- KPIs -->
+    <div class="flujo-kpis">
+      <div class="flujo-kpi">
+        <div class="flujo-kpi-label" style="color:rgba(52,199,89,0.7)">Ingresos</div>
+        <div class="flujo-kpi-val" style="color:var(--green)">$17.842.500</div>
+        <div class="flujo-kpi-sub">↑ 12% vs abril</div>
+      </div>
+      <div class="flujo-divider"></div>
+      <div class="flujo-kpi">
+        <div class="flujo-kpi-label" style="color:rgba(255,59,48,0.7)">Egresos</div>
+        <div class="flujo-kpi-val" style="color:var(--red)">$9.214.300</div>
+        <div class="flujo-kpi-sub">↓ 4% vs abril</div>
+      </div>
+      <div class="flujo-divider"></div>
+      <div class="flujo-kpi">
+        <div class="flujo-kpi-label" style="color:rgba(90,200,250,0.7)">Balance neto</div>
+        <div class="flujo-kpi-val" style="color:var(--blue)">$8.628.200</div>
+        <div class="flujo-kpi-sub">Margen 48%</div>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="flujo-chart">
+      <div class="flujo-chart-header">
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(52,199,89,0.6)"></div>Ingresos</div>
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(255,59,48,0.6)"></div>Egresos</div>
+      </div>
+
+      <!-- Semana 1 -->
+      <div class="chart-row">
+        <div class="chart-label">S1</div>
+        <div class="chart-bars">
+          <div class="chart-bar-wrap">
+            <div class="chart-bar bar-ingreso" style="width:72%"></div>
+            <span class="chart-bar-val">$4.210.000</span>
+          </div>
+          <div class="chart-bar-wrap">
+            <div class="chart-bar bar-egreso" style="width:38%"></div>
+            <span class="chart-bar-val">$2.180.000</span>
+          </div>
+        </div>
+      </div>
+      <div class="chart-sep"></div>
+
+      <!-- Semana 2 -->
+      <div class="chart-row">
+        <div class="chart-label">S2</div>
+        <div class="chart-bars">
+          <div class="chart-bar-wrap">
+            <div class="chart-bar bar-ingreso" style="width:85%"></div>
+            <span class="chart-bar-val">$4.980.000</span>
+          </div>
+          <div class="chart-bar-wrap">
+            <div class="chart-bar bar-egreso" style="width:45%"></div>
+            <span class="chart-bar-val">$2.640.000</span>
+          </div>
+        </div>
+      </div>
+      <div class="chart-sep"></div>
+
+      <!-- Semana 3 -->
+      <div class="chart-row">
+        <div class="chart-label">S3</div>
+        <div class="chart-bars">
+          <div class="chart-bar-wrap">
+            <div class="chart-bar bar-ingreso" style="width:100%"></div>
+            <span class="chart-bar-val">$5.860.000</span>
+          </div>
+          <div class="chart-bar-wrap">
+            <div class="chart-bar bar-egreso" style="width:52%"></div>
+            <span class="chart-bar-val">$3.040.000</span>
+          </div>
+        </div>
+      </div>
+      <div class="chart-sep"></div>
+
+      <!-- Semana 4 (parcial) -->
+      <div class="chart-row">
+        <div class="chart-label">S4</div>
+        <div class="chart-bars">
+          <div class="chart-bar-wrap">
+            <div class="chart-bar bar-ingreso" style="width:47%;opacity:0.5"></div>
+            <span class="chart-bar-val" style="opacity:0.5">$2.792.500 <span style="font-size:9px;color:rgba(255,255,255,0.3)">parcial</span></span>
+          </div>
+          <div class="chart-bar-wrap">
+            <div class="chart-bar bar-egreso" style="width:24%;opacity:0.5"></div>
+            <span class="chart-bar-val" style="opacity:0.5">$1.354.300</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Balance total -->
+      <div class="balance-row">
+        <span class="balance-label">Balance mensual</span>
+        <div class="balance-bar-wrap">
+          <div class="balance-bar-fill" style="width:48%"></div>
+        </div>
+        <span class="balance-val">$8.628.200</span>
+      </div>
+    </div>
+
   </div>
 
   <!-- Footer -->
