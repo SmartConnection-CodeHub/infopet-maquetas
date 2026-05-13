@@ -676,14 +676,15 @@
       <div>
         <div class="detail-title">Barf Chile</div>
         <div class="detail-sub">
-          Comida húmeda · 10 productos
+          Comida húmeda · 10 productos ·
+          Actualizado: <strong style="color:var(--green)" id="sync-time"></strong>
           <span class="model-tag">⚡ Sonnet · SES híbrido</span>
         </div>
       </div>
       <div class="detail-actions">
         <div class="sync-info">
           Próx. pedido sugerido<br>
-          <strong style="color:var(--amber);font-size:14px">en 8 días</strong>
+          <strong style="color:var(--amber);font-size:14px" id="dias-pedido"></strong>
         </div>
       </div>
     </div>
@@ -975,11 +976,24 @@ function initDates() {
   const mar  = nextTuesday(hoy)
   const mar2 = nextTuesday(new Date(mar.getTime() + 86400000))
   const dias = Math.round((mar - hoy) / 86400000)
-  document.getElementById('next-tuesday').textContent = fmtDate(mar)
-  document.getElementById('cover-period').textContent = fmtDate(mar) + ' → ' + fmtDate(mar2)
-  document.getElementById('days-badge').textContent = dias === 0 ? '¡Hoy!' : `en ${dias} día${dias !== 1 ? 's' : ''}`
-  document.getElementById('title-date').textContent = fmtDate(mar)
+
+  document.getElementById('next-tuesday').textContent  = fmtDate(mar)
+  document.getElementById('cover-period').textContent  = fmtDate(mar) + ' → ' + fmtDate(mar2)
+  document.getElementById('days-badge').textContent    = dias === 0 ? '¡Hoy!' : `en ${dias} día${dias !== 1 ? 's' : ''}`
+  document.getElementById('title-date').textContent    = fmtDate(mar)
   document.getElementById('footer-period').textContent = fmtDate(mar) + ' → ' + fmtDate(mar2)
+  document.getElementById('dias-pedido').textContent   = dias === 0 ? '¡Hoy!' : `en ${dias} día${dias !== 1 ? 's' : ''}`
+
+  // Reloj en tiempo real
+  function updateClock() {
+    const now = new Date()
+    const fecha = now.toLocaleDateString('es-CL', { weekday:'short', day:'numeric', month:'short', year:'numeric' })
+    const hora  = now.toLocaleTimeString('es-CL', { hour:'2-digit', minute:'2-digit' })
+    const el = document.getElementById('sync-time')
+    if (el) el.textContent = `${fecha} · ${hora}`
+  }
+  updateClock()
+  setInterval(updateClock, 1000)
 }
 
 function renderTable() {
