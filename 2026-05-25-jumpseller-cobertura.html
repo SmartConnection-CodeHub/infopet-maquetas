@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InfoPet — Jumpseller · Cobertura de Productos</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #0C1210;
+  color: #f1f5f9;
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+.sidebar {
+  width: 210px; min-height: 100vh;
+  background: rgba(255,255,255,0.025);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  display: flex; flex-direction: column; flex-shrink: 0;
+}
+.sidebar-logo {
+  padding: 18px 16px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: 10px;
+}
+.logo-icon {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: #2D6A4F; display: flex; align-items: center;
+  justify-content: center; font-size: 15px;
+}
+.logo-text { font-size: 13px; font-weight: 700; color: #fff; }
+.logo-badge {
+  font-size: 8px; font-weight: 700; letter-spacing: 1.5px;
+  background: rgba(45,106,79,0.5); color: rgba(255,255,255,0.85);
+  padding: 2px 6px; border-radius: 4px; text-transform: uppercase;
+}
+.sidebar-nav { padding: 10px 8px; flex: 1; }
+.nav-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 9px; border-radius: 8px;
+  font-size: 12px; color: rgba(255,255,255,0.45);
+  cursor: pointer; transition: all 0.15s; margin-bottom: 1px;
+}
+.nav-item:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.75); }
+.nav-item.active { background: rgba(45,106,79,0.18); color: #34C759; font-weight: 600; }
+.nav-icon { font-size: 14px; width: 18px; text-align: center; flex-shrink: 0; }
+.nav-section {
+  font-size: 9px; font-weight: 700; letter-spacing: 2px;
+  color: rgba(255,255,255,0.2); text-transform: uppercase;
+  padding: 14px 9px 5px;
+}
+
+/* ── Main ────────────────────────────────────────────────── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+.topbar {
+  height: 48px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; flex-shrink: 0;
+}
+.topbar-left { display: flex; align-items: center; gap: 8px; }
+.topbar-title { font-size: 13px; font-weight: 600; color: #fff; }
+.topbar-sep { color: rgba(255,255,255,0.2); font-size: 12px; }
+.topbar-sub { font-size: 12px; color: rgba(255,255,255,0.45); }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #2D6A4F; display: flex; align-items: center;
+  justify-content: center; font-size: 11px; font-weight: 700; color: #fff;
+}
+.refresh-btn {
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.6); padding: 4px 10px; border-radius: 8px;
+  font-size: 11px; cursor: pointer; font-family: inherit;
+  transition: all 0.15s;
+}
+.refresh-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+.content { flex: 1; overflow-y: auto; padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
+
+/* ── Glass ───────────────────────────────────────────────── */
+.glass {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px;
+}
+
+/* ── Page header ─────────────────────────────────────────── */
+.page-header h1 { font-size: 20px; font-weight: 700; color: #fff; }
+.page-header p  { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 3px; }
+
+/* ── Coverage panel ──────────────────────────────────────── */
+.coverage-panel { padding: 24px 28px; display: flex; align-items: center; gap: 36px; }
+.ring-wrap { flex-shrink: 0; }
+.coverage-right { flex: 1; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.coverage-bar-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.coverage-bar-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.35); }
+.coverage-bar-val   { font-size: 12px; font-weight: 700; color: #34C759; }
+.bar-track { height: 10px; background: rgba(255,255,255,0.06); border-radius: 99px; overflow: hidden; }
+.bar-fill  { height: 100%; border-radius: 99px; background: linear-gradient(90deg,#2D6A4F,#34C759); transition: width 0.8s ease; }
+.stat-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+.stat-card {
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px; padding: 14px 16px; text-align: center;
+}
+.stat-val { font-size: 26px; font-weight: 700; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; line-height: 1; }
+.stat-lbl { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-top: 5px; }
+
+/* ── Marca breakdown ─────────────────────────────────────── */
+.breakdown-panel { padding: 20px 24px; }
+.breakdown-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 14px; }
+.breakdown-grid  { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 10px; }
+.brand-card {
+  background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px; padding: 12px 14px;
+}
+.brand-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.brand-name { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.85); }
+.brand-pct  { font-size: 11px; font-weight: 700; }
+.brand-bar-track { height: 4px; background: rgba(255,255,255,0.07); border-radius: 99px; overflow: hidden; margin-bottom: 5px; }
+.brand-bar-fill  { height: 100%; border-radius: 99px; transition: width 0.6s ease; }
+.brand-nums { font-size: 10px; color: rgba(255,255,255,0.3); }
+
+/* ── Filtros ─────────────────────────────────────────────── */
+.filter-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.search-wrap { position: relative; flex: 1; min-width: 200px; }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; color: rgba(255,255,255,0.25); pointer-events: none; }
+.search-input {
+  width: 100%;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px; padding: 9px 14px 9px 36px;
+  font-size: 13px; color: #fff; font-family: inherit;
+  outline: none; transition: border-color 0.15s;
+}
+.search-input::placeholder { color: rgba(255,255,255,0.25); }
+.search-input:focus { border-color: rgba(90,200,250,0.35); }
+.filter-select {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px; padding: 9px 14px; font-size: 12px;
+  color: rgba(255,255,255,0.7); font-family: inherit;
+  outline: none; cursor: pointer; transition: border-color 0.15s;
+}
+.filter-select:focus { border-color: rgba(90,200,250,0.35); }
+.publish-bulk {
+  display: none; align-items: center; gap: 8px;
+  background: rgba(45,106,79,0.18); border: 1px solid rgba(52,199,89,0.3);
+  color: #34C759; font-size: 12px; font-weight: 600;
+  padding: 9px 16px; border-radius: 10px; cursor: pointer;
+  font-family: inherit; transition: all 0.15s; margin-left: auto;
+}
+.publish-bulk.visible { display: flex; }
+.publish-bulk:hover { background: rgba(45,106,79,0.3); }
+
+/* ── Tabla ───────────────────────────────────────────────── */
+.table-wrap { overflow: hidden; }
+.table-header {
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,0.02);
+}
+.table-header-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.75); }
+.table-header-sub   { font-size: 11px; color: rgba(255,255,255,0.3); margin-left: 8px; }
+.badge-amber {
+  font-size: 10px; font-weight: 700;
+  background: rgba(255,149,0,0.1); color: #FF9500;
+  border: 1px solid rgba(255,149,0,0.22); padding: 3px 9px; border-radius: 99px;
+}
+.table-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead tr { border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.01); }
+th {
+  padding: 10px 14px; text-align: left;
+  font-size: 9px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: rgba(255,255,255,0.28);
+  white-space: nowrap;
+}
+th.right { text-align: right; }
+th.center { text-align: center; }
+tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.025); }
+tbody tr.selected { background: rgba(52,199,89,0.04); }
+td { padding: 11px 14px; font-size: 13px; color: rgba(255,255,255,0.7); }
+td.sku   { font-family: monospace; font-size: 11px; color: rgba(255,255,255,0.35); }
+td.name  { font-weight: 500; color: rgba(255,255,255,0.9); max-width: 260px; }
+td.name span { display: block; font-size: 11px; color: rgba(255,255,255,0.35); font-weight: 400; margin-top: 1px; }
+td.price { text-align: right; font-weight: 600; font-family: 'Bebas Neue',sans-serif; font-size: 15px; letter-spacing: 0.5px; color: rgba(255,255,255,0.8); }
+td.action { text-align: center; }
+.brand-pill {
+  display: inline-block; font-size: 10px; font-weight: 600;
+  background: rgba(90,200,250,0.08); color: #5AC8FA;
+  border: 1px solid rgba(90,200,250,0.18); padding: 2px 9px; border-radius: 99px;
+  white-space: nowrap;
+}
+.btn-publish {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600;
+  background: rgba(45,106,79,0.15); border: 1px solid rgba(52,199,89,0.25);
+  color: #34C759; padding: 5px 12px; border-radius: 8px;
+  cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap;
+}
+.btn-publish:hover { background: rgba(45,106,79,0.3); }
+.empty-row td { text-align: center; color: rgba(255,255,255,0.25); font-size: 13px; padding: 36px; }
+input[type=checkbox] { accent-color: #34C759; width: 14px; height: 14px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- ── Sidebar ── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🐾</div>
+    <div>
+      <div class="logo-text">InfoPet</div>
+    </div>
+    <span class="logo-badge">Panel</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <div class="nav-item"><span class="nav-icon">🏠</span>Inicio</div>
+    <div class="nav-item"><span class="nav-icon">📦</span>Stock</div>
+    <div class="nav-item"><span class="nav-icon">🧾</span>Facturas</div>
+    <div class="nav-section">Operaciones</div>
+    <div class="nav-item"><span class="nav-icon">🥩</span>Pedidos</div>
+    <div class="nav-item active"><span class="nav-icon">🛒</span>Jumpseller</div>
+    <div class="nav-item"><span class="nav-icon">📊</span>Reportes</div>
+    <div class="nav-item"><span class="nav-icon">🤖</span>IA</div>
+    <div class="nav-section">Sistema</div>
+    <div class="nav-item"><span class="nav-icon">🔄</span>Sync</div>
+    <div class="nav-item"><span class="nav-icon">⚙️</span>Ajustes</div>
+  </nav>
+</aside>
+
+<!-- ── Main ── -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-title">Jumpseller</span>
+      <span class="topbar-sep">›</span>
+      <span class="topbar-sub">Cobertura de productos</span>
+    </div>
+    <div class="topbar-right">
+      <button class="refresh-btn" onclick="simulateRefresh(this)">↻ Actualizar</button>
+      <div class="avatar">JR</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- Page header -->
+    <div class="page-header">
+      <h1>Jumpseller</h1>
+      <p>Productos de Carga Maestra pendientes de publicación en la tienda online</p>
+    </div>
+
+    <!-- Coverage panel -->
+    <div class="glass coverage-panel">
+      <div class="ring-wrap">
+        <svg id="ring" width="130" height="130" viewBox="0 0 130 130">
+          <circle cx="65" cy="65" r="50" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="11"/>
+          <circle id="ring-fill" cx="65" cy="65" r="50" fill="none"
+            stroke="#34C759" stroke-width="11"
+            stroke-dasharray="0 314.16" stroke-linecap="round"
+            transform="rotate(-90 65 65)"
+            style="transition:stroke-dasharray 1s ease"/>
+          <text x="65" y="60" text-anchor="middle" fill="#fff" font-size="22" font-weight="700" font-family="'Bebas Neue',sans-serif" letter-spacing="1">73%</text>
+          <text x="65" y="76" text-anchor="middle" fill="rgba(255,255,255,0.35)" font-size="8" font-weight="700" letter-spacing="2" font-family="Inter,sans-serif">PUBLICADOS</text>
+        </svg>
+      </div>
+
+      <div class="coverage-right">
+        <div>
+          <div class="coverage-bar-row">
+            <span class="coverage-bar-label">Cobertura total</span>
+            <span class="coverage-bar-val">910 / 1.240</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" id="main-bar" style="width:0%"></div></div>
+        </div>
+        <div class="stat-cards">
+          <div class="stat-card">
+            <div class="stat-val" style="color:#fff">1.240</div>
+            <div class="stat-lbl">En Maestra</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val" style="color:#34C759">910</div>
+            <div class="stat-lbl">Publicados</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val" style="color:#FF9500">330</div>
+            <div class="stat-lbl">Sin publicar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Breakdown por marca -->
+    <div class="glass breakdown-panel">
+      <div class="breakdown-title">Cobertura por marca</div>
+      <div class="breakdown-grid" id="breakdown-grid"></div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" id="search" placeholder="Buscar por SKU, nombre o marca…" oninput="filterTable()">
+      </div>
+      <select class="filter-select" id="marcaFilter" onchange="filterTable()">
+        <option value="">Todas las marcas</option>
+      </select>
+      <button class="publish-bulk" id="bulk-btn" onclick="publishSelected()">
+        <span>↑</span> <span id="bulk-label">Publicar 0 seleccionados</span>
+      </button>
+    </div>
+
+    <!-- Tabla -->
+    <div class="glass table-wrap">
+      <div class="table-header">
+        <div>
+          <span class="table-header-title">Sin publicar</span>
+          <span class="table-header-sub" id="table-count">330 productos</span>
+        </div>
+        <span class="badge-amber">330 pendientes</span>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:40px"><input type="checkbox" id="check-all" onchange="toggleAll(this)"></th>
+              <th>SKU</th>
+              <th>Producto</th>
+              <th>Marca</th>
+              <th>Variante</th>
+              <th class="right">Precio</th>
+              <th class="center">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+// ── Datos de maqueta ──────────────────────────────────────
+const PRODUCTOS = [
+  { sku:'1901', nombre:'ZeeDog H3D Bounce H-Harness',          variante:'Large',    marca:'ZeeDog',     precio:49990 },
+  { sku:'1903', nombre:'ZeeDog H3D Fly H-Harness',             variante:'Small',    marca:'ZeeDog',     precio:49990 },
+  { sku:'2041', nombre:'Bravery Tuna and Vegetables',           variante:'400g',     marca:'Bravery',    precio:4490  },
+  { sku:'2043', nombre:'Bravery Salmon Adult Medium / Large',   variante:'12 kg',    marca:'Bravery',    precio:69990 },
+  { sku:'2088', nombre:'Orijen Regional Red Adult',             variante:'6 kg',     marca:'Orijen',     precio:89990 },
+  { sku:'2090', nombre:'Orijen Six Fish',                       variante:'11.4 kg',  marca:'Orijen',     precio:109990},
+  { sku:'2103', nombre:'Acana Pacifica Dog',                    variante:'11.4 kg',  marca:'Acana',      precio:74990 },
+  { sku:'2107', nombre:'Acana Grasslands Dog',                  variante:'6 kg',     marca:'Acana',      precio:52990 },
+  { sku:'2154', nombre:'Belcando Adult Grain-Free Atlantic',    variante:'1 kg',     marca:'Belcando',   precio:19990 },
+  { sku:'2158', nombre:'Belcando Finest Crock',                 variante:'12.5 kg',  marca:'Belcando',   precio:64990 },
+  { sku:'2201', nombre:'Kong Cozie Ultra Ella Elephant',        variante:'M',        marca:'Kong',       precio:14990 },
+  { sku:'2205', nombre:'Kong Classic Red',                      variante:'L',        marca:'Kong',       precio:18990 },
+  { sku:'2230', nombre:'Tropiclean Spa Comfort Shampoo',        variante:'355 ml',   marca:'Tropiclean', precio:12990 },
+  { sku:'2234', nombre:'Tropiclean Fresh Breath Gel',           variante:'59 ml',    marca:'Tropiclean', precio:8990  },
+  { sku:'2278', nombre:'Simparica 40 mg',                       variante:'5-10 kg',  marca:'Zoetis',     precio:22990 },
+  { sku:'2281', nombre:'Simparica Trio Small',                  variante:'1.25-2.5', marca:'Zoetis',     precio:19990 },
+  { sku:'2312', nombre:'Protexin VET Pro-Kolin Advanced Dog',   variante:'15 ml',    marca:'Protexin',   precio:9990  },
+  { sku:'2315', nombre:'Protexin VET Fibreplex Cats',           variante:'15 ml',    marca:'Protexin',   precio:11990 },
+  { sku:'2345', nombre:'FuzzYard Reversible Jacket',            variante:'S',        marca:'FuzzYard',   precio:34990 },
+  { sku:'2348', nombre:'FuzzYard Easy Harness',                 variante:'XS',       marca:'FuzzYard',   precio:29990 },
+  { sku:'2367', nombre:'Applaws Chicken Breast Fillet Cat',     variante:'70g',      marca:'Applaws',    precio:2490  },
+  { sku:'2370', nombre:'Applaws Tuna Fillet with Salmon',       variante:'70g',      marca:'Applaws',    precio:2490  },
+  { sku:'2389', nombre:'ZeeDog NeoPro Pink H-Harness',          variante:'Small',    marca:'ZeeDog',     precio:44990 },
+  { sku:'2395', nombre:'ZeeDog Neon Hunter Collar',             variante:'XS',       marca:'ZeeDog',     precio:24990 },
+  { sku:'2401', nombre:'Oven Baked Senior Small Breed',         variante:'9.07 kg',  marca:'Oven Baked', precio:69990 },
+  { sku:'2405', nombre:'Oven Baked Puppy Large Breed',          variante:'11.34 kg', marca:'Oven Baked', precio:72990 },
+  { sku:'2423', nombre:'Calibra Dog Life Stage Adult M/L',      variante:'12 kg',    marca:'Calibra',    precio:49990 },
+  { sku:'2428', nombre:'Calibra Cat Premium Adult Chicken',     variante:'6 kg',     marca:'Calibra',    precio:28990 },
+  { sku:'2445', nombre:'Pro Plan Adult Sensitive Skin',         variante:'15 kg',    marca:'Pro Plan',   precio:84990 },
+  { sku:'2451', nombre:'Pro Plan Puppy Medium Breed',           variante:'12 kg',    marca:'Pro Plan',   precio:79990 },
+]
+
+const MARCAS_DATA = [
+  { marca:'ZeeDog',     total:62,  pub:54 },
+  { marca:'Bravery',    total:48,  pub:41 },
+  { marca:'Orijen',     total:31,  pub:22 },
+  { marca:'Acana',      total:44,  pub:38 },
+  { marca:'Belcando',   total:87,  pub:79 },
+  { marca:'Kong',       total:28,  pub:21 },
+  { marca:'Tropiclean', total:35,  pub:30 },
+  { marca:'Pro Plan',   total:52,  pub:44 },
+  { marca:'Calibra',    total:41,  pub:35 },
+  { marca:'FuzzYard',   total:19,  pub:14 },
+  { marca:'Applaws',    total:38,  pub:33 },
+  { marca:'Oven Baked', total:24,  pub:19 },
+]
+
+const fmt = n => '$' + n.toLocaleString('es-CL')
+let selected = new Set()
+let filtered = [...PRODUCTOS]
+
+// ── Init ──────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  // Animar barra y ring
+  setTimeout(() => {
+    document.getElementById('main-bar').style.width = '73%'
+    const circ = 2 * Math.PI * 50
+    document.getElementById('ring-fill').setAttribute('stroke-dasharray', (0.73 * circ) + ' ' + circ)
+  }, 100)
+
+  // Breakdown de marcas
+  const grid = document.getElementById('breakdown-grid')
+  MARCAS_DATA.forEach(b => {
+    const pct   = Math.round(b.pub / b.total * 100)
+    const color = pct >= 90 ? '#34C759' : pct >= 70 ? '#FF9500' : '#FF3B30'
+    const falta = b.total - b.pub
+    grid.innerHTML += `
+      <div class="brand-card">
+        <div class="brand-card-top">
+          <span class="brand-name">${b.marca}</span>
+          <span class="brand-pct" style="color:${color}">${pct}%</span>
+        </div>
+        <div class="brand-bar-track">
+          <div class="brand-bar-fill" style="width:${pct}%;background:${color}"></div>
+        </div>
+        <div class="brand-nums">${b.pub} pub · <span style="color:#FF9500">${falta} sin pub</span> · ${b.total} total</div>
+      </div>`
+  })
+
+  // Populate select
+  const sel = document.getElementById('marcaFilter')
+  const marcas = [...new Set(PRODUCTOS.map(p => p.marca))].sort()
+  marcas.forEach(m => sel.innerHTML += `<option value="${m}">${m}</option>`)
+
+  renderTable()
+})
+
+function renderTable() {
+  const tbody = document.getElementById('tbody')
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="7">Sin resultados para esa búsqueda</td></tr>`
+    document.getElementById('table-count').textContent = '0 productos'
+    return
+  }
+  document.getElementById('table-count').textContent = filtered.length + ' producto' + (filtered.length !== 1 ? 's' : '') + (filtered.length < PRODUCTOS.length ? ' (filtrado)' : '')
+  tbody.innerHTML = filtered.map(p => `
+    <tr class="${selected.has(p.sku) ? 'selected' : ''}" id="row-${p.sku}">
+      <td><input type="checkbox" ${selected.has(p.sku)?'checked':''} onchange="toggleRow('${p.sku}',this)"></td>
+      <td class="sku">${p.sku}</td>
+      <td class="name">${p.nombre}<span>${p.variante}</span></td>
+      <td><span class="brand-pill">${p.marca}</span></td>
+      <td style="font-size:12px;color:rgba(255,255,255,0.45)">${p.variante}</td>
+      <td class="price">${fmt(p.precio)}</td>
+      <td class="action"><button class="btn-publish" onclick="publishOne('${p.sku}')">↑ Publicar</button></td>
+    </tr>`).join('')
+}
+
+function filterTable() {
+  const q = document.getElementById('search').value.toLowerCase()
+  const m = document.getElementById('marcaFilter').value
+  filtered = PRODUCTOS.filter(p => {
+    const matchQ = !q || p.nombre.toLowerCase().includes(q) || p.sku.includes(q) || p.marca.toLowerCase().includes(q)
+    const matchM = !m || p.marca === m
+    return matchQ && matchM
+  })
+  renderTable()
+  updateBulkBtn()
+}
+
+function toggleRow(sku, cb) {
+  cb.checked ? selected.add(sku) : selected.delete(sku)
+  document.getElementById('row-' + sku).classList.toggle('selected', cb.checked)
+  updateBulkBtn()
+}
+
+function toggleAll(cb) {
+  filtered.forEach(p => cb.checked ? selected.add(p.sku) : selected.delete(p.sku))
+  renderTable()
+  updateBulkBtn()
+}
+
+function updateBulkBtn() {
+  const btn   = document.getElementById('bulk-btn')
+  const label = document.getElementById('bulk-label')
+  const n     = selected.size
+  label.textContent = 'Publicar ' + n + ' seleccionado' + (n !== 1 ? 's' : '')
+  btn.classList.toggle('visible', n > 0)
+}
+
+function publishOne(sku) {
+  const p = PRODUCTOS.find(x => x.sku === sku)
+  alert('↑ Publicar: ' + p.nombre + ' (SKU ' + sku + ')\n\n[Próximamente — conectará con publicar-producto.mjs]')
+}
+
+function publishSelected() {
+  const skus = [...selected]
+  alert('↑ Publicar ' + skus.length + ' producto(s):\n' + skus.join(', ') + '\n\n[Próximamente — publicación masiva]')
+}
+
+function simulateRefresh(btn) {
+  btn.textContent = '↻ Actualizando…'
+  btn.disabled = true
+  setTimeout(() => { btn.textContent = '↻ Actualizar'; btn.disabled = false }, 1800)
+}
+</script>
+</body>
+</html>
